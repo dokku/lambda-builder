@@ -8,7 +8,7 @@ require (
 	github.com/alexellis/go-execute v0.5.0
 	github.com/google/uuid v1.3.0
 	github.com/josegonzalez/cli-skeleton v0.4.0
-	github.com/mattn/go-isatty v0.0.12
+	github.com/mattn/go-isatty v0.0.14
 	github.com/mitchellh/cli v1.1.2
 	github.com/posener/complete v1.2.3
 	github.com/rs/zerolog v1.26.1
