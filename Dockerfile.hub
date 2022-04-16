@@ -1,0 +1,3 @@
+FROM scratch
+COPY ./build/linux/lambda-builder-amd64 /lambda-builder
+ENTRYPOINT ["/lambda-builder"]
