@@ -72,17 +72,9 @@ func (u *ZerologUi) Fields(newFields map[string]interface{}) *ZerologUi {
 }
 
 func ZerologUiWithFields(ui cli.Ui, fields map[string]interface{}) *ZerologUi {
-	if isTerminal {
-		return &ZerologUi{
-			StderrLogger:   zerolog.New(HumanWriter{Out: os.Stderr}).With().Fields(fields).Timestamp().Logger(),
-			StdoutLogger:   zerolog.New(HumanWriter{Out: os.Stdout}).With().Fields(fields).Timestamp().Logger(),
-			OriginalFields: fields,
-			Ui:             ui,
-		}
-	}
 	return &ZerologUi{
-		StderrLogger:   zerolog.New(os.Stderr).With().Fields(fields).Timestamp().Logger(),
-		StdoutLogger:   zerolog.New(os.Stdout).With().Fields(fields).Timestamp().Logger(),
+		StderrLogger:   zerolog.New(HumanWriter{Out: os.Stderr}).With().Fields(fields).Timestamp().Logger(),
+		StdoutLogger:   zerolog.New(HumanWriter{Out: os.Stdout}).With().Fields(fields).Timestamp().Logger(),
 		OriginalFields: fields,
 		Ui:             ui,
 	}
