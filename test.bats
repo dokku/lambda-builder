@@ -74,6 +74,13 @@ teardown_file() {
   [[ "$status" -eq 0 ]]
 }
 
+@test "[build] pip-runtime" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/pip-runtime
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
 @test "[build] pipenv" {
   run $LAMBDA_BUILDER_BIN build --working-directory tests/pipenv
   echo "output: $output"
@@ -90,13 +97,6 @@ teardown_file() {
 
 @test "[build] ruby" {
   run $LAMBDA_BUILDER_BIN build --working-directory tests/ruby
-  echo "output: $output"
-  echo "status: $status"
-  [[ "$status" -eq 0 ]]
-}
-
-@test "[build] runtime" {
-  run $LAMBDA_BUILDER_BIN build --working-directory tests/runtime
   echo "output: $output"
   echo "status: $status"
   [[ "$status" -eq 0 ]]
