@@ -6,14 +6,16 @@ type GoBuilder struct {
 	Config Config
 }
 
-func NewGoBuilder(config Config) GoBuilder {
-	if config.BuildImage == "" {
-		config.BuildImage = "lambci/lambda:build-go1.x"
+func NewGoBuilder(config Config) (GoBuilder, error) {
+	var err error
+	config.BuildImage, err = getBuilder(config, "lambci/lambda:build-go1.x")
+	if err != nil {
+		return GoBuilder{}, err
 	}
 
 	return GoBuilder{
 		Config: config,
-	}
+	}, nil
 }
 
 func (b GoBuilder) BuildImage() string {

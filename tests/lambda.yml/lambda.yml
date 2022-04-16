@@ -1,0 +1,3 @@
+---
+build_image: mlupin/docker-lambda:dotnetcore3.1-build
+builder: dotnet

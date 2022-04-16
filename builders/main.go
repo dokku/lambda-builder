@@ -2,8 +2,14 @@ package builders
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
+	"lambda-builder/io"
 
 	execute "github.com/alexellis/go-execute/pkg/v1"
+	"gopkg.in/yaml.v2"
 )
 
 type Builder interface {
@@ -19,6 +25,11 @@ type Config struct {
 	Identifier       string
 	RunQuiet         bool
 	WorkingDirectory string
+}
+
+type LambdaYML struct {
+	Builder    string `yaml:"builder"`
+	BuildImage string `yaml:"build_image"`
 }
 
 func executeBuilder(script string, config Config) error {
@@ -51,4 +62,41 @@ func executeBuilder(script string, config Config) error {
 	}
 
 	return nil
+}
+
+func ParseLambdaYML(config Config) (LambdaYML, error) {
+	var lambdaYML LambdaYML
+	if !io.FileExistsInDirectory(config.WorkingDirectory, "lambda.yml") {
+		return lambdaYML, nil
+	}
+
+	f, err := os.Open(filepath.Join(config.WorkingDirectory, "lambda.yml"))
+	if err != nil {
+		return lambdaYML, fmt.Errorf("error opening lambda.yml: %s", err.Error())
+	}
+	defer f.Close()
+
+	bytes, err := ioutil.ReadAll(f)
+	if err != nil {
+		return lambdaYML, fmt.Errorf("error reading lambda.yml: %s", err.Error())
+	}
+
+	if err := yaml.Unmarshal(bytes, &lambdaYML); err != nil {
+		return lambdaYML, fmt.Errorf("error unmarshaling lambda.yml: %s", err.Error())
+	}
+
+	return lambdaYML, nil
+}
+
+func getBuilder(config Config, defaultImage string) (string, error) {
+	if config.BuildImage != "" {
+		return config.BuildImage, nil
+	}
+
+	lambdaYML, err := ParseLambdaYML(config)
+	if err != nil {
+		return "", err
+	}
+
+	return lambdaYML.BuildImage, nil
 }

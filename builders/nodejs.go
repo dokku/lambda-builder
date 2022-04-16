@@ -6,14 +6,16 @@ type NodejsBuilder struct {
 	Config Config
 }
 
-func NewNodejsBuilder(config Config) NodejsBuilder {
-	if config.BuildImage == "" {
-		config.BuildImage = "mlupin/docker-lambda:nodejs14.x-build"
+func NewNodejsBuilder(config Config) (NodejsBuilder, error) {
+	var err error
+	config.BuildImage, err = getBuilder(config, "mlupin/docker-lambda:nodejs14.x-build")
+	if err != nil {
+		return NodejsBuilder{}, err
 	}
 
 	return NodejsBuilder{
 		Config: config,
-	}
+	}, nil
 }
 
 func (b NodejsBuilder) BuildImage() string {
@@ -26,9 +28,6 @@ func (b NodejsBuilder) GetConfig() Config {
 
 func (b NodejsBuilder) Detect() bool {
 	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "package-lock.json") {
-		return true
-	}
-	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "yarn.lock") {
 		return true
 	}
 

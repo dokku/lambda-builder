@@ -6,14 +6,16 @@ type DotnetBuilder struct {
 	Config Config
 }
 
-func NewDotnetBuilder(config Config) DotnetBuilder {
-	if config.BuildImage == "" {
-		config.BuildImage = "mlupin/docker-lambda:dotnet6-build"
+func NewDotnetBuilder(config Config) (DotnetBuilder, error) {
+	var err error
+	config.BuildImage, err = getBuilder(config, "mlupin/docker-lambda:dotnet6-build")
+	if err != nil {
+		return DotnetBuilder{}, err
 	}
 
 	return DotnetBuilder{
 		Config: config,
-	}
+	}, nil
 }
 
 func (b DotnetBuilder) BuildImage() string {

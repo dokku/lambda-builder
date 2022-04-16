@@ -137,15 +137,50 @@ func (c *BuildCommand) Run(args []string) int {
 }
 
 func detectBuilder(config builders.Config) (builders.Builder, error) {
-	builders := []builders.Builder{
-		builders.NewDotnetBuilder(config),
-		builders.NewGoBuilder(config),
-		builders.NewNodejsBuilder(config),
-		builders.NewPythonBuilder(config),
-		builders.NewRubyBuilder(config),
+	var builder builders.Builder
+	var err error
+	bs := []builders.Builder{}
+
+	lambdaYML, err := builders.ParseLambdaYML(config)
+	if err != nil {
+		return nil, err
 	}
 
-	for _, builder := range builders {
+	builder, err = builders.NewDotnetBuilder(config)
+	if err != nil {
+		return nil, err
+	}
+	bs = append(bs, builder)
+
+	builder, err = builders.NewGoBuilder(config)
+	if err != nil {
+		return nil, err
+	}
+	bs = append(bs, builder)
+
+	builder, err = builders.NewNodejsBuilder(config)
+	if err != nil {
+		return nil, err
+	}
+	bs = append(bs, builder)
+
+	builder, err = builders.NewPythonBuilder(config)
+	if err != nil {
+		return nil, err
+	}
+	bs = append(bs, builder)
+
+	builder, err = builders.NewRubyBuilder(config)
+	if err != nil {
+		return nil, err
+	}
+	bs = append(bs, builder)
+
+	for _, builder := range bs {
+		if lambdaYML.Builder != builder.Name() {
+			continue
+		}
+
 		if builder.Detect() {
 			return builder, nil
 		}

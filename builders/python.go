@@ -18,19 +18,24 @@ type PythonBuilder struct {
 	Config Config
 }
 
-func NewPythonBuilder(config Config) PythonBuilder {
+func NewPythonBuilder(config Config) (PythonBuilder, error) {
+	var err error
+	version := "3.9"
 	if config.BuildImage == "" {
-		version, err := parsePythonVersion(config.WorkingDirectory, []string{"3.8", "3.9"})
+		version, err = parsePythonVersion(config.WorkingDirectory, []string{"3.8", "3.9"})
 		if err != nil {
-			panic(err)
+			return PythonBuilder{}, err
 		}
+	}
 
-		config.BuildImage = fmt.Sprintf("mlupin/docker-lambda:python%s-build", version)
+	config.BuildImage, err = getBuilder(config, fmt.Sprintf("mlupin/docker-lambda:python%s-build", version))
+	if err != nil {
+		return PythonBuilder{}, err
 	}
 
 	return PythonBuilder{
 		Config: config,
-	}
+	}, nil
 }
 
 func (b PythonBuilder) BuildImage() string {
@@ -220,7 +225,7 @@ func parsePythonVersionFromPipfileLock(workingDirectory string) (string, error) 
 	}
 	var pipefileLock PipefileLock
 	if err := json.Unmarshal(bytes, &pipefileLock); err != nil {
-		return "", err
+		return "", fmt.Errorf("error unmarshaling Pipfile.lock: %s", err.Error())
 	}
 
 	if pipefileLock.Meta.Requires.PythonVersion == "" {

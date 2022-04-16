@@ -6,14 +6,16 @@ type RubyBuilder struct {
 	Config Config
 }
 
-func NewRubyBuilder(config Config) RubyBuilder {
-	if config.BuildImage == "" {
-		config.BuildImage = "mlupin/docker-lambda:ruby2.7-build"
+func NewRubyBuilder(config Config) (RubyBuilder, error) {
+	var err error
+	config.BuildImage, err = getBuilder(config, "mlupin/docker-lambda:ruby2.7-build")
+	if err != nil {
+		return RubyBuilder{}, err
 	}
 
 	return RubyBuilder{
 		Config: config,
-	}
+	}, nil
 }
 
 func (b RubyBuilder) BuildImage() string {

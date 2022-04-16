@@ -25,11 +25,46 @@ teardown_file() {
   [[ "$status" -eq 0 ]]
 }
 
+@test "[build] lambda.yml" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/lambda.yml
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
+@test "[build] lambda.yml-invalid-image" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/lambda.yml-invalid-image
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 1 ]]
+}
+
+@test "[build] lambda.yml-nonexistent-builder" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/lambda.yml-nonexistent-builder
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 1 ]]
+}
+
 @test "[build] npm" {
   run $LAMBDA_BUILDER_BIN build --working-directory tests/npm
   echo "output: $output"
   echo "status: $status"
   [[ "$status" -eq 0 ]]
+}
+
+@test "[build] nonexistent" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/nonexistent
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 1 ]]
+}
+
+@test "[build] non-detected" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/non-detected
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 1 ]]
 }
 
 @test "[build] pip" {
