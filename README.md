@@ -41,7 +41,7 @@ lambda-builder build --working-directory path/to/app
 
 ### How does it work
 
-Internally, `lambda-builder` detects a given language and builds the app according to the script specified by the builder within an environment emulating AWS Lambda. If a builder is not detected, the build will fail. The following languages are supported:
+Internally, `lambda-builder` detects a given language and builds the app according to the script specified by the detected builder within a disposablecontainer environment emulating AWS Lambda. If a builder is not detected, the build will fail. The following languages are supported:
 
 - `dotnet`
   - default build image: `mlupin/docker-lambda:dotnet6-build`
