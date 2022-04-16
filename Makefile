@@ -62,6 +62,7 @@ $(targets): %-in-docker: .env.docker
 		--volume /var/lib/docker:/var/lib/docker \
 		--volume /var/run/docker.sock:/var/run/docker.sock:ro \
 		--volume ${PWD}:/src/github.com/$(MAINTAINER)/$(REPOSITORY) \
+		--volume ${PWD}:/home/runner/work/$(REPOSITORY)/$(REPOSITORY) \
 		--workdir /src/github.com/$(MAINTAINER)/$(REPOSITORY) \
 		$(IMAGE_NAME):build make -e $(@:-in-docker=)
 
@@ -249,7 +250,7 @@ validate:
 	sha1sum build/deb/$(NAME)_$(VERSION)_arm64.deb
 	sha1sum build/deb/$(NAME)_$(VERSION)_armhf.deb
 	sha1sum build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
-	bats test.bats
+	cd /home/runner/work/$(REPOSITORY)/$(REPOSITORY) && bats test.bats
 
 prebuild:
 	true
