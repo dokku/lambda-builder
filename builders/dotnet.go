@@ -68,9 +68,7 @@ hook-package() {
   fi
 
   puts-step "Creating package at lambda.zip"
-  pushd "pub" >/dev/null || return 1
-  zip -q -r ../lambda.zip ./*
-  popd  >/dev/null || return 1
+  zip -q -r lambda.zip ./*
   mv lambda.zip /tmp/task/lambda.zip
 }
 
