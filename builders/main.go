@@ -98,5 +98,9 @@ func getBuilder(config Config, defaultImage string) (string, error) {
 		return "", err
 	}
 
+	if lambdaYML.BuildImage == "" {
+		return defaultImage, nil
+	}
+
 	return lambdaYML.BuildImage, nil
 }

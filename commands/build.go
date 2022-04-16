@@ -177,7 +177,7 @@ func detectBuilder(config builders.Config) (builders.Builder, error) {
 	bs = append(bs, builder)
 
 	for _, builder := range bs {
-		if lambdaYML.Builder != builder.Name() {
+		if lambdaYML.Builder != "" && lambdaYML.Builder != builder.Name() {
 			continue
 		}
 
