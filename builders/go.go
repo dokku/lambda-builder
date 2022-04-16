@@ -11,10 +11,6 @@ func NewGoBuilder(config Config) GoBuilder {
 		config.BuildImage = "lambci/lambda:build-go1.x"
 	}
 
-	if config.RunImage == "" {
-		config.RunImage = "mlupin/docker-lambda:go1.x"
-	}
-
 	return GoBuilder{
 		Config: config,
 	}

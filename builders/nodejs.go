@@ -11,10 +11,6 @@ func NewNodejsBuilder(config Config) NodejsBuilder {
 		config.BuildImage = "mlupin/docker-lambda:nodejs14.x-build"
 	}
 
-	if config.RunImage == "" {
-		config.RunImage = "mlupin/docker-lambda:nodejs14.x"
-	}
-
 	return NodejsBuilder{
 		Config: config,
 	}

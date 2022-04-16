@@ -16,9 +16,7 @@ type Builder interface {
 
 type Config struct {
 	BuildImage       string
-	Export           bool
 	Identifier       string
-	RunImage         string
 	RunQuiet         bool
 	WorkingDirectory string
 }

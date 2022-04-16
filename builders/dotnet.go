@@ -11,10 +11,6 @@ func NewDotnetBuilder(config Config) DotnetBuilder {
 		config.BuildImage = "mlupin/docker-lambda:dotnet6-build"
 	}
 
-	if config.RunImage == "" {
-		config.RunImage = "mlupin/docker-lambda:dotnet6"
-	}
-
 	return DotnetBuilder{
 		Config: config,
 	}

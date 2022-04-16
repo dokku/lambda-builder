@@ -11,10 +11,6 @@ func NewRubyBuilder(config Config) RubyBuilder {
 		config.BuildImage = "mlupin/docker-lambda:ruby2.7-build"
 	}
 
-	if config.RunImage == "" {
-		config.RunImage = "mlupin/docker-lambda:ruby2.7"
-	}
-
 	return RubyBuilder{
 		Config: config,
 	}

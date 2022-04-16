@@ -28,15 +28,6 @@ func NewPythonBuilder(config Config) PythonBuilder {
 		config.BuildImage = fmt.Sprintf("mlupin/docker-lambda:python%s-build", version)
 	}
 
-	if config.RunImage == "" {
-		version, err := parsePythonVersion(config.WorkingDirectory, []string{"3.8", "3.9"})
-		if err != nil {
-			panic(err)
-		}
-
-		config.RunImage = fmt.Sprintf("mlupin/docker-lambda:python%s", version)
-	}
-
 	return PythonBuilder{
 		Config: config,
 	}
