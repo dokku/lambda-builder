@@ -244,5 +244,4 @@ validate:
 	bats test.bats
 
 prebuild:
-	go get -u github.com/go-bindata/go-bindata/...
-	cd export && go-bindata -pkg export templates/...
+	true
