@@ -9,6 +9,10 @@ A tool for building lamda functions into uploadable zip files via Docker.
 go build -ldflags "-X main.Version=0.1.0
 ```
 
+## Dependencies
+
+- The `docker` binary
+
 ## Usage
 
 ```
