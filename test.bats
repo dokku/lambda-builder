@@ -1,0 +1,68 @@
+#!/usr/bin/env bats
+
+export SYSTEM_NAME="$(uname -s | tr '[:upper:]' '[:lower:]')"
+export LAMBDA_BUILDER_BIN="build/$SYSTEM_NAME/lambda-builder-amd64"
+
+setup_file() {
+  make prebuild "$LAMBDA_BUILDER_BIN"
+}
+
+teardown_file() {
+  make clean
+}
+
+@test "[build] dotnet6" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/dotnet6
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
+@test "[build] go" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/go
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
+@test "[build] npm" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/npm
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
+@test "[build] pip" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/pip
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
+@test "[build] pipenv" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/pipenv
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
+@test "[build] poetry" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/poetry
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
+@test "[build] ruby" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/ruby
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
+@test "[build] runtime" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/runtime
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
