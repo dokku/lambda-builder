@@ -94,6 +94,10 @@ puts-step() {
   echo "-----> $*"
 }
 
+puts-warning() {
+  echo " !     $*"
+}
+
 install-pip() {
   puts-step "Installing dependencies via pip"
   version="$(python-major-minor)"
@@ -156,6 +160,9 @@ elif [[ -f "Pipfile" ]]; then
   install-pipenv
 elif [[ -f "poetry.lock" ]] || [[ -f "pyproject.toml" ]]; then
   install-poetry
+else
+	puts-warning "No dependency file detected"
+	exit 1
 fi
 
 cleanup-deps
