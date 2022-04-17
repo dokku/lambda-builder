@@ -67,17 +67,21 @@ func executeBuilder(script string, taskBuildDir string, config Config) error {
 	}
 
 	handler := getFunctionHandler(tmp, config)
-	if handler != "" && config.WriteProcfile && !io.FileExistsInDirectory(tmp, "Procfile") {
-		fmt.Printf("=====> Writing Procfile from handler: %s\n", handler)
+	if config.WriteProcfile && !io.FileExistsInDirectory(tmp, "Procfile") {
+		if handler == "" {
+			fmt.Printf(" !     Unable to detect handler in build directory\n")
+		} else {
+			fmt.Printf("=====> Writing Procfile from handler: %s\n", handler)
 
-		fmt.Printf("       Writing to working directory\n")
-		if err := writeProcfile(handler, config.WorkingDirectory); err != nil {
-			return fmt.Errorf("error writing Procfile to working directory: %s", err.Error())
-		}
+			fmt.Printf("       Writing to working directory\n")
+			if err := writeProcfile(handler, config.WorkingDirectory); err != nil {
+				return fmt.Errorf("error writing Procfile to working directory: %s", err.Error())
+			}
 
-		fmt.Printf("       Writing to build directory\n")
-		if err := writeProcfile(handler, tmp); err != nil {
-			return fmt.Errorf("error writing Procfile to temporary build directory: %s", err.Error())
+			fmt.Printf("       Writing to build directory\n")
+			if err := writeProcfile(handler, tmp); err != nil {
+				return fmt.Errorf("error writing Procfile to temporary build directory: %s", err.Error())
+			}
 		}
 	}
 
