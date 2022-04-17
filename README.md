@@ -138,7 +138,7 @@ All builders support both pre (run before the app is compiled) and post (run aft
 
 When the app is built, a `lambda.zip` will be produced in the specified working directory. The resulting `lambda.zip` can be uploaded to S3 and used within a Lambda function.
 
-Both the builder and the build image environment can be overriden in an optional `lambda.yml` file in the specified working directory.
+Both the builder, build image environment, and the run image environment can be overriden in an optional `lambda.yml` file in the specified working directory.
 
 ### `lambda.yml`
 
