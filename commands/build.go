@@ -20,10 +20,12 @@ type BuildCommand struct {
 	command.Meta
 
 	buildImage       bool
+	handler          string
 	imageTag         string
 	labels           []string
 	quiet            bool
 	workingDirectory string
+	writeProcfile    bool
 }
 
 func (c *BuildCommand) Name() string {
@@ -65,8 +67,10 @@ func (c *BuildCommand) FlagSet() *flag.FlagSet {
 	}
 
 	f := c.Meta.FlagSet(c.Name(), command.FlagSetClient)
-	f.BoolVar(&c.quiet, "quiet", false, "run builder in quiet mode")
 	f.BoolVar(&c.buildImage, "build-image", false, "build a docker image")
+	f.BoolVar(&c.quiet, "quiet", false, "run builder in quiet mode")
+	f.BoolVar(&c.writeProcfile, "write-procfile", false, "writes a Procfile if a handler is specified or detected")
+	f.StringVar(&c.handler, "handler", "", "handler override to specify as the default command to run in a built image")
 	f.StringVarP(&c.imageTag, "tag", "t", "", "name and optionally a tag in the 'name:tag' format")
 	f.StringVar(&c.workingDirectory, "working-directory", workingDirectory, "working directory")
 	f.StringArrayVar(&c.labels, "label", []string{}, " set metadata for an image")
@@ -77,8 +81,9 @@ func (c *BuildCommand) AutocompleteFlags() complete.Flags {
 	return command.MergeAutocompleteFlags(
 		c.Meta.AutocompleteFlags(command.FlagSetClient),
 		complete.Flags{
-			"--build-image": complete.PredictNothing,
-			"--quiet":       complete.PredictNothing,
+			"--build-image":    complete.PredictNothing,
+			"--quiet":          complete.PredictNothing,
+			"--write-procfile": complete.PredictNothing,
 		},
 	)
 }
@@ -122,6 +127,7 @@ func (c *BuildCommand) Run(args []string) int {
 		ImageLabels:      c.labels,
 		ImageTag:         c.imageTag,
 		RunQuiet:         c.quiet,
+		WriteProcfile:    c.writeProcfile,
 		WorkingDirectory: c.workingDirectory,
 	}
 
@@ -134,7 +140,7 @@ func (c *BuildCommand) Run(args []string) int {
 
 	c.Ui.Info(fmt.Sprintf("Detected %s builder", builder.Name()))
 
-	logger.LogHeader1(fmt.Sprintf("Building app with image %s", builder.BuildImage()))
+	logger.LogHeader1(fmt.Sprintf("Building app with image %s", builder.GetBuildImage()))
 	if err := builder.Execute(); err != nil {
 		c.Ui.Error(err.Error())
 		return 1

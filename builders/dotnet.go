@@ -23,10 +23,6 @@ func NewDotnetBuilder(config Config) (DotnetBuilder, error) {
 	}, nil
 }
 
-func (b DotnetBuilder) BuildImage() string {
-	return b.Config.BuilderBuildImage
-}
-
 func (b DotnetBuilder) Detect() bool {
 	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "Function.cs") {
 		return true
@@ -36,11 +32,20 @@ func (b DotnetBuilder) Detect() bool {
 }
 
 func (b DotnetBuilder) Execute() error {
+	b.Config.HandlerMap = b.GetHandlerMap()
 	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b DotnetBuilder) GetBuildImage() string {
+	return b.Config.BuilderBuildImage
 }
 
 func (b DotnetBuilder) GetConfig() Config {
 	return b.Config
+}
+
+func (b DotnetBuilder) GetHandlerMap() map[string]string {
+	return map[string]string{}
 }
 
 func (b DotnetBuilder) GetTaskBuildDir() string {

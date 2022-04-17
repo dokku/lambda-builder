@@ -23,10 +23,6 @@ func NewGoBuilder(config Config) (GoBuilder, error) {
 	}, nil
 }
 
-func (b GoBuilder) BuildImage() string {
-	return b.Config.BuilderBuildImage
-}
-
 func (b GoBuilder) Detect() bool {
 	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "go.sum") {
 		return true
@@ -36,11 +32,22 @@ func (b GoBuilder) Detect() bool {
 }
 
 func (b GoBuilder) Execute() error {
+	b.Config.HandlerMap = b.GetHandlerMap()
 	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b GoBuilder) GetBuildImage() string {
+	return b.Config.BuilderBuildImage
 }
 
 func (b GoBuilder) GetConfig() Config {
 	return b.Config
+}
+
+func (b GoBuilder) GetHandlerMap() map[string]string {
+	return map[string]string{
+		"bootstrap": "bootstrap",
+	}
 }
 
 func (b GoBuilder) GetTaskBuildDir() string {
