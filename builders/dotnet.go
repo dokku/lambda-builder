@@ -78,6 +78,26 @@ install-dotnet() {
   dotnet publish -c Release -o pub 2>&1 | indent
 }
 
+hook-pre-compile() {
+  if [[ ! -f bin/pre_compile ]]; then
+    return
+  fi
+
+  puts-step "Running pre-compile hook"
+  chmod +x bin/pre_compile
+  bin/pre_compile
+}
+
+hook-post-compile() {
+  if [[ ! -f bin/post_compile ]]; then
+    return
+  fi
+
+  puts-step "Running post-compile hook"
+  chmod +x bin/post_compile
+  bin/post_compile
+}
+
 hook-package() {
   if [[ "$LAMBDA_BUILD_ZIP" != "1" ]]; then
     return
@@ -90,7 +110,9 @@ hook-package() {
 }
 
 cp -a /tmp/task/. /var/task
+hook-pre-compile
 install-dotnet
+hook-post-compile
 hook-package
 `
 }

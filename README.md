@@ -134,6 +134,8 @@ Internally, `lambda-builder` detects a given language and builds the app accordi
   - runtimes:
     - ruby2.7
 
+All builders support both pre (run before the app is compiled) and post (run after the app is compiled but before it is compressed into a `lambda.zip` file) compile hooks in the form of `bin/pre_compile` and `bin/post_compile`. These can be shell scripts or executables.
+
 When the app is built, a `lambda.zip` will be produced in the specified working directory. The resulting `lambda.zip` can be uploaded to S3 and used within a Lambda function.
 
 Both the builder and the build image environment can be overriden in an optional `lambda.yml` file in the specified working directory.

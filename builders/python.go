@@ -157,6 +157,26 @@ cleanup-deps() {
   rm -rf /var/task/.venv
 }
 
+hook-pre-compile() {
+  if [[ ! -f bin/pre_compile ]]; then
+    return
+  fi
+
+  puts-step "Running pre-compile hook"
+  chmod +x bin/pre_compile
+  bin/pre_compile
+}
+
+hook-post-compile() {
+  if [[ ! -f bin/post_compile ]]; then
+    return
+  fi
+
+  puts-step "Running post-compile hook"
+  chmod +x bin/post_compile
+  bin/post_compile
+}
+
 hook-package() {
   if [[ "$LAMBDA_BUILD_ZIP" != "1" ]]; then
     return
@@ -169,6 +189,7 @@ hook-package() {
 }
 
 cp -a /tmp/task/. /var/task
+hook-pre-compile
 
 if [[ -f "requirements.txt" ]]; then
   install-pip
@@ -182,6 +203,7 @@ else
 fi
 
 cleanup-deps
+hook-post-compile
 hook-package
 `
 }
