@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"lambda-builder/io"
 
@@ -32,6 +33,7 @@ type Config struct {
 	Identifier        string
 	ImageLabels       []string
 	ImageTag          string
+	Port              int
 	RunQuiet          bool
 	WriteProcfile     bool
 	WorkingDirectory  string
@@ -143,6 +145,10 @@ func generateDockerfile(cmd string, directory string, config Config) error {
 
 	tpl, err := template.New("t1").Parse(`
 FROM {{ .run_image }}
+{{ if ne .port "-1" }}
+ENV DOCKER_LAMBDA_API_PORT={{ .port }}
+ENV DOCKER_LAMBDA_RUNTIME_PORT={{ .port }}
+{{ end }}
 {{ if ne .command "" }}
 CMD ["{{ .cmd }}"]
 {{ end }}
@@ -154,6 +160,7 @@ COPY . /var/task
 
 	data := map[string]string{
 		"cmd":       cmd,
+		"port":      strconv.Itoa(config.Port),
 		"run_image": config.BuilderRunImage,
 	}
 
