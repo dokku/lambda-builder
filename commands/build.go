@@ -19,8 +19,10 @@ import (
 type BuildCommand struct {
 	command.Meta
 
+	buildEnv         []string
 	buildImage       bool
 	handler          string
+	imageEnv         []string
 	imageTag         string
 	labels           []string
 	port             int
@@ -75,7 +77,9 @@ func (c *BuildCommand) FlagSet() *flag.FlagSet {
 	f.StringVar(&c.handler, "handler", "", "handler override to specify as the default command to run in a built image")
 	f.StringVarP(&c.imageTag, "tag", "t", "", "name and optionally a tag in the 'name:tag' format")
 	f.StringVar(&c.workingDirectory, "working-directory", workingDirectory, "working directory")
-	f.StringArrayVar(&c.labels, "label", []string{}, " set metadata for an image")
+	f.StringArrayVar(&c.buildEnv, "build-env", []string{}, "environment variables to be set for the build context")
+	f.StringArrayVar(&c.imageEnv, "image-env", []string{}, "environment variables to be committed to a built image")
+	f.StringArrayVar(&c.labels, "label", []string{}, "set metadata for an image")
 	return f
 }
 
@@ -83,7 +87,9 @@ func (c *BuildCommand) AutocompleteFlags() complete.Flags {
 	return command.MergeAutocompleteFlags(
 		c.Meta.AutocompleteFlags(command.FlagSetClient),
 		complete.Flags{
+			"--build-env":      complete.PredictAnything,
 			"--build-image":    complete.PredictNothing,
+			"--image-env":      complete.PredictAnything,
 			"--port":           complete.PredictAnything,
 			"--quiet":          complete.PredictNothing,
 			"--write-procfile": complete.PredictNothing,
@@ -125,8 +131,10 @@ func (c *BuildCommand) Run(args []string) int {
 
 	identifier := uuid.New().String()
 	config := builders.Config{
+		BuildEnv:         c.buildEnv,
 		BuildImage:       c.buildImage,
 		Identifier:       identifier,
+		ImageEnv:         c.imageEnv,
 		ImageLabels:      c.labels,
 		ImageTag:         c.imageTag,
 		Port:             c.port,

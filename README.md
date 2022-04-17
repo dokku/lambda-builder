@@ -28,6 +28,8 @@ Available commands are:
     version    Return the version of the binary
 ```
 
+### Building an image
+
 To build an app:
 
 ```shell
@@ -44,7 +46,16 @@ Alternatively, a given path can be specified via the `--working-directory` flag:
 lambda-builder build --working-directory path/to/app
 ```
 
-In addition to the `lambda.yml`, a docker image can be produced from the generated artifact by specifying the `--build-image` flag. This also allows for multiple `--label`  flags as well as specifying a single image tag via either `-t` or `--tag`:
+Custom environemt variables can be supplied for the build environment by specifying one or more `--build-env` flags. The `--build-env` flag takes `KEY=VALUE` pairs.
+
+```shell
+# the build step will have access to both the --build-env pairs
+lambda-builder build --build-env KEY=VALUE --build-env ANOTHER_KEY=some-value
+```
+
+#### Building an image
+
+A docker image can be produced from the generated artifact by specifying the `--build-image` flag. This also allows for multiple `--label`  flags as well as specifying a single image tag via either `-t` or `--tag`:
 
 ```shell
 # will write a lambda.zip in the specified path
@@ -65,6 +76,15 @@ By default, any web process started by the built image starts on port `9001`. Th
 # build the image and ensure it starts on port 5000 by default
 lambda-builder build --build-image --port 5000
 ````
+
+Custom environemt variables can be supplied for the built image by specifying one or more `--image-env` flags. The `--image-env` flag takes `KEY=VALUE` pairs.
+
+```shell
+# the built image will have `ENV` directives corresponding to the values specified by `--image-env`
+lambda-builder build --build-image --image-env KEY=VALUE --image-env ANOTHER_KEY=some-value
+```
+
+#### Generating a Procfile
 
 A `Procfile` can be written to the working directory by specifying the `--write-procfile` flag. This file will not be written if one already exists in the working directory. If an image is being built, the detected handler will also be injected into the build context and used as the default `CMD` for the image. The contents of the `Procfile` are a `web` process type and a detected handler.
 
