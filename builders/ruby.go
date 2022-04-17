@@ -23,10 +23,6 @@ func NewRubyBuilder(config Config) (RubyBuilder, error) {
 	}, nil
 }
 
-func (b RubyBuilder) BuildImage() string {
-	return b.Config.BuilderBuildImage
-}
-
 func (b RubyBuilder) Detect() bool {
 	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "Gemfile.lock") {
 		return true
@@ -35,8 +31,19 @@ func (b RubyBuilder) Detect() bool {
 	return false
 }
 
+func (b RubyBuilder) GetBuildImage() string {
+	return b.Config.BuilderBuildImage
+}
+
 func (b RubyBuilder) GetConfig() Config {
 	return b.Config
+}
+
+func (b RubyBuilder) GetHandlerMap() map[string]string {
+	return map[string]string{
+		"function.rb":        "function.handler",
+		"lambda_function.rb": "lambda_function.handler",
+	}
 }
 
 func (b RubyBuilder) GetTaskBuildDir() string {
@@ -44,6 +51,7 @@ func (b RubyBuilder) GetTaskBuildDir() string {
 }
 
 func (b RubyBuilder) Execute() error {
+	b.Config.HandlerMap = b.GetHandlerMap()
 	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
 }
 

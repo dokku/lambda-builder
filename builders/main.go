@@ -14,11 +14,12 @@ import (
 )
 
 type Builder interface {
-	GetConfig() Config
-	GetTaskBuildDir() string
 	Detect() bool
 	Execute() error
-	BuildImage() string
+	GetBuildImage() string
+	GetConfig() Config
+	GetHandlerMap() map[string]string
+	GetTaskBuildDir() string
 	Name() string
 }
 
@@ -26,10 +27,13 @@ type Config struct {
 	BuildImage        bool
 	BuilderBuildImage string
 	BuilderRunImage   string
+	Handler           string
+	HandlerMap        map[string]string
 	Identifier        string
 	ImageLabels       []string
 	ImageTag          string
 	RunQuiet          bool
+	WriteProcfile     bool
 	WorkingDirectory  string
 }
 
@@ -62,10 +66,25 @@ func executeBuilder(script string, taskBuildDir string, config Config) error {
 		return err
 	}
 
+	handler := getFunctionHandler(tmp, config)
+	if handler != "" && config.WriteProcfile && !io.FileExistsInDirectory(tmp, "Procfile") {
+		fmt.Printf("=====> Writing Procfile from handler: %s\n", handler)
+
+		fmt.Printf("       Writing to working directory\n")
+		if err := writeProcfile(handler, config.WorkingDirectory); err != nil {
+			return fmt.Errorf("error writing Procfile to working directory: %s", err.Error())
+		}
+
+		fmt.Printf("       Writing to build directory\n")
+		if err := writeProcfile(handler, tmp); err != nil {
+			return fmt.Errorf("error writing Procfile to temporary build directory: %s", err.Error())
+		}
+	}
+
 	if config.BuildImage {
 		fmt.Printf("=====> Building image\n")
 		fmt.Printf("       Generating temporary Dockerfile\n")
-		if err := generateDockerfile(tmp, config); err != nil {
+		if err := generateDockerfile(handler, tmp, config); err != nil {
 			return err
 		}
 
@@ -111,8 +130,8 @@ func executeBuildContainer(tmp string, script string, taskBuildDir string, confi
 	return nil
 }
 
-func generateDockerfile(tmp string, config Config) error {
-	dockerfileName := filepath.Join(tmp, fmt.Sprintf("%s.Dockerfile", config.Identifier))
+func generateDockerfile(cmd string, directory string, config Config) error {
+	dockerfileName := filepath.Join(directory, fmt.Sprintf("%s.Dockerfile", config.Identifier))
 	f, err := os.Create(dockerfileName)
 	if err != nil {
 		return fmt.Errorf("error creating Dockerfile: %s", err)
@@ -120,6 +139,9 @@ func generateDockerfile(tmp string, config Config) error {
 
 	tpl, err := template.New("t1").Parse(`
 FROM {{ .run_image }}
+{{ if ne .command "" }}
+CMD ["{{ .cmd }}"]
+{{ end }}
 COPY . /var/task
 `)
 	if err != nil {
@@ -127,6 +149,7 @@ COPY . /var/task
 	}
 
 	data := map[string]string{
+		"cmd":       cmd,
 		"run_image": config.BuilderRunImage,
 	}
 
@@ -137,11 +160,11 @@ COPY . /var/task
 	return nil
 }
 
-func buildDockerImage(tmp string, config Config) error {
+func buildDockerImage(directory string, config Config) error {
 	args := []string{
 		"image",
 		"build",
-		"--file", filepath.Join(tmp, fmt.Sprintf("%s.Dockerfile", config.Identifier)),
+		"--file", filepath.Join(directory, fmt.Sprintf("%s.Dockerfile", config.Identifier)),
 		"--progress", "plain",
 		"--tag", config.GetImageTag(),
 	}
@@ -150,7 +173,7 @@ func buildDockerImage(tmp string, config Config) error {
 		args = append(args, "--label", label)
 	}
 
-	args = append(args, tmp)
+	args = append(args, directory)
 
 	cmd := execute.ExecTask{
 		Args:        args,

@@ -43,10 +43,6 @@ func NewPythonBuilder(config Config) (PythonBuilder, error) {
 	}, nil
 }
 
-func (b PythonBuilder) BuildImage() string {
-	return b.Config.BuilderBuildImage
-}
-
 func (b PythonBuilder) Detect() bool {
 	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "requirements.txt") {
 		return true
@@ -64,11 +60,25 @@ func (b PythonBuilder) Detect() bool {
 }
 
 func (b PythonBuilder) Execute() error {
+	b.Config.HandlerMap = b.GetHandlerMap()
 	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b PythonBuilder) GetBuildImage() string {
+	return b.Config.BuilderBuildImage
 }
 
 func (b PythonBuilder) GetConfig() Config {
 	return b.Config
+}
+
+func (b PythonBuilder) GetHandlerMap() map[string]string {
+	return map[string]string{
+		"app.py":             "app.handler",
+		"function.py":        "function.handler",
+		"lambda_function.py": "lambda_function.handler",
+		"main.py":            "main.handler",
+	}
 }
 
 func (b PythonBuilder) GetTaskBuildDir() string {

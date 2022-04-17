@@ -23,10 +23,6 @@ func NewNodejsBuilder(config Config) (NodejsBuilder, error) {
 	}, nil
 }
 
-func (b NodejsBuilder) BuildImage() string {
-	return b.Config.BuilderBuildImage
-}
-
 func (b NodejsBuilder) Detect() bool {
 	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "package-lock.json") {
 		return true
@@ -36,11 +32,23 @@ func (b NodejsBuilder) Detect() bool {
 }
 
 func (b NodejsBuilder) Execute() error {
+	b.Config.HandlerMap = b.GetHandlerMap()
 	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b NodejsBuilder) GetBuildImage() string {
+	return b.Config.BuilderBuildImage
 }
 
 func (b NodejsBuilder) GetConfig() Config {
 	return b.Config
+}
+
+func (b NodejsBuilder) GetHandlerMap() map[string]string {
+	return map[string]string{
+		"function.js":        "function.handler",
+		"lambda_function.js": "lambda_function.handler",
+	}
 }
 
 func (b NodejsBuilder) GetTaskBuildDir() string {
