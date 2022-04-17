@@ -59,6 +59,13 @@ lambda-builder build --build-image --label com.example/key=value --label com.exa
 lambda-builder build --build-image --tag app/awesome:1234
 ```
 
+By default, any web process started by the built image starts on port `9001`. This can be overriden via the `--port` environment variable.
+
+```shell
+# build the image and ensure it starts on port 5000 by default
+lambda-builder build --build-image --port 5000
+````
+
 A `Procfile` can be written to the working directory by specifying the `--write-procfile` flag. This file will not be written if one already exists in the working directory. If an image is being built, the detected handler will also be injected into the build context and used as the default `CMD` for the image. The contents of the `Procfile` are a `web` process type and a detected handler.
 
 ```shell
