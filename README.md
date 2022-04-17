@@ -2,6 +2,10 @@
 
 A tool for building lamda functions into uploadable zip files via Docker based on work from [@lambci](https://github.com/lambci/docker-lambda) and [@mLupine](https://github.com/mLupine/docker-lambda).
 
+## Why?
+
+I don't want to go through the motions of figuring out the correct way to build my app for AWS. I suspect there are others out there who feel the same.
+
 ## Building
 
 ```shell
