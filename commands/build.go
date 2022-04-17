@@ -87,12 +87,17 @@ func (c *BuildCommand) AutocompleteFlags() complete.Flags {
 	return command.MergeAutocompleteFlags(
 		c.Meta.AutocompleteFlags(command.FlagSetClient),
 		complete.Flags{
-			"--build-env":      complete.PredictAnything,
-			"--generate-image": complete.PredictNothing,
-			"--image-env":      complete.PredictAnything,
-			"--port":           complete.PredictAnything,
-			"--quiet":          complete.PredictNothing,
-			"--write-procfile": complete.PredictNothing,
+			"--build-env":         complete.PredictAnything,
+			"--generate-image":    complete.PredictNothing,
+			"--handler":           complete.PredictAnything,
+			"--image-env":         complete.PredictAnything,
+			"--label":             complete.PredictAnything,
+			"--port":              complete.PredictAnything,
+			"--quiet":             complete.PredictNothing,
+			"-t":                  complete.PredictAnything,
+			"--tag":               complete.PredictAnything,
+			"--working-directory": complete.PredictAnything,
+			"--write-procfile":    complete.PredictNothing,
 		},
 	)
 }
