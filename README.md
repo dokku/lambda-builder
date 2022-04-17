@@ -6,16 +6,17 @@ A tool for building lamda functions into uploadable zip files via Docker based o
 
 I don't want to go through the motions of figuring out the correct way to build my app for AWS. I suspect there are others out there who feel the same.
 
+## Dependencies
+
+- The `docker` binary
+- Golang 1.7+
+
 ## Building
 
 ```shell
 # substitute the version number as desired
 go build -ldflags "-X main.Version=0.1.0
 ```
-
-## Dependencies
-
-- The `docker` binary
 
 ## Usage
 
