@@ -72,3 +72,7 @@ builder: dotnet
 
 - `build_image`: A docker image that is accessible by the docker daemon. The `build_image` _should_ be based on an existing Lambda image - builders may fail if they cannot run within the specified `build_image`. The build will fail if the image is inaccessible by the docker daemon.
 - `builder`: The name of a builder. This may be used if multiple builders match and a specific builder is desired. If an invalid builder is specified, the build will fail.
+
+## Examples
+
+See the `tests` directory for examples on how to use this project.

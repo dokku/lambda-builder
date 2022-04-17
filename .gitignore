@@ -25,3 +25,5 @@ validation/*
 
 lambda-builder
 lambda.zip
+
+response.json
