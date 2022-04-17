@@ -23,6 +23,7 @@ type BuildCommand struct {
 	handler          string
 	imageTag         string
 	labels           []string
+	port             int
 	quiet            bool
 	workingDirectory string
 	writeProcfile    bool
@@ -70,6 +71,7 @@ func (c *BuildCommand) FlagSet() *flag.FlagSet {
 	f.BoolVar(&c.buildImage, "build-image", false, "build a docker image")
 	f.BoolVar(&c.quiet, "quiet", false, "run builder in quiet mode")
 	f.BoolVar(&c.writeProcfile, "write-procfile", false, "writes a Procfile if a handler is specified or detected")
+	f.IntVar(&c.port, "port", -1, "set the default port for the lambda to listen on")
 	f.StringVar(&c.handler, "handler", "", "handler override to specify as the default command to run in a built image")
 	f.StringVarP(&c.imageTag, "tag", "t", "", "name and optionally a tag in the 'name:tag' format")
 	f.StringVar(&c.workingDirectory, "working-directory", workingDirectory, "working directory")
@@ -82,6 +84,7 @@ func (c *BuildCommand) AutocompleteFlags() complete.Flags {
 		c.Meta.AutocompleteFlags(command.FlagSetClient),
 		complete.Flags{
 			"--build-image":    complete.PredictNothing,
+			"--port":           complete.PredictAnything,
 			"--quiet":          complete.PredictNothing,
 			"--write-procfile": complete.PredictNothing,
 		},
@@ -126,6 +129,7 @@ func (c *BuildCommand) Run(args []string) int {
 		Identifier:       identifier,
 		ImageLabels:      c.labels,
 		ImageTag:         c.imageTag,
+		Port:             c.port,
 		RunQuiet:         c.quiet,
 		WriteProcfile:    c.writeProcfile,
 		WorkingDirectory: c.workingDirectory,
