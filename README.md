@@ -28,7 +28,7 @@ Available commands are:
     version    Return the version of the binary
 ```
 
-### Building an image
+### Building an app
 
 To build an app:
 
