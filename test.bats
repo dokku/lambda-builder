@@ -34,6 +34,13 @@ teardown_file() {
   [[ "$status" -eq 0 ]]
 }
 
+@test "[build] hooks" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/hooks
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+}
+
 @test "[build] lambda.yml" {
   run $LAMBDA_BUILDER_BIN build --working-directory tests/lambda.yml
   echo "output: $output"
