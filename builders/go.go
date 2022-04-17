@@ -75,6 +75,7 @@ hook-package() {
   puts-step "Creating package at lambda.zip"
   zip -q -r lambda.zip bootstrap
   mv lambda.zip /tmp/task/lambda.zip
+  rm -rf lambda.zip
 }
 
 cp -a /tmp/task/. /go/src/handler
