@@ -46,19 +46,32 @@ Internally, `lambda-builder` detects a given language and builds the app accordi
 - `dotnet`
   - default build image: `mlupin/docker-lambda:dotnet6-build`
   - requirement: `Function.cs`
+  - runtimes:
+    - dotnet6
+    - dotnetcore3.1
 - `go`
   - default build image: `lambci/lambda:build-go1.x`
   - requirement: `go.mod`
+  - runtimes:
+    - provided.al2
 - `nodejs`
   - default build image: `mlupin/docker-lambda:nodejs14.x-build`
   - requirement: `package-lock.json`
+  - runtimes:
+    - nodejs12.x
+    - nodejs14.x
 - `python`
   - default build image: `mlupin/docker-lambda:python3.9-build`
   - requirement: `requirements.txt`, `poetry.lock`, or `Pipfile.lock`
   - notes: Autodetects the python version from `poetry.lock`, `Pipfile.lock`, or `runtime.txt`
+  - runtimes:
+    - python3.8
+    - python3.9
 - `ruby`
   - default build image: `mlupin/docker-lambda:ruby2.7-build`
   - requirement: `Gemfile.lock`
+  - runtimes:
+    - ruby2.7
 
 When the app is built, a `lambda.zip` will be produced in the specified working directory. The resulting `lambda.zip` can be uploaded to S3 and used within a Lambda function.
 
@@ -72,6 +85,10 @@ builder: dotnet
 
 - `build_image`: A docker image that is accessible by the docker daemon. The `build_image` _should_ be based on an existing Lambda image - builders may fail if they cannot run within the specified `build_image`. The build will fail if the image is inaccessible by the docker daemon.
 - `builder`: The name of a builder. This may be used if multiple builders match and a specific builder is desired. If an invalid builder is specified, the build will fail.
+
+### Deploying
+
+The `lambda.zip` file can be directly uploaded to a lambda function and used as is by specifying the correct runtime. See the `test.bats` files in any of the `test` examples for more info on how to perform this with the `awscli` (v2).
 
 ## Examples
 
