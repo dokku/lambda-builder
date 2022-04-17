@@ -46,7 +46,7 @@ Alternatively, a given path can be specified via the `--working-directory` flag:
 lambda-builder build --working-directory path/to/app
 ```
 
-Custom environemt variables can be supplied for the build environment by specifying one or more `--build-env` flags. The `--build-env` flag takes `KEY=VALUE` pairs.
+Custom environment variables can be supplied for the build environment by specifying one or more `--build-env` flags. The `--build-env` flag takes `KEY=VALUE` pairs.
 
 ```shell
 # the build step will have access to both the --build-env pairs
@@ -77,7 +77,7 @@ By default, any web process started by the built image starts on port `9001`. Th
 lambda-builder build --build-image --port 5000
 ````
 
-Custom environemt variables can be supplied for the built image by specifying one or more `--image-env` flags. The `--image-env` flag takes `KEY=VALUE` pairs.
+Custom environment variables can be supplied for the built image by specifying one or more `--image-env` flags. The `--image-env` flag takes `KEY=VALUE` pairs.
 
 ```shell
 # the built image will have `ENV` directives corresponding to the values specified by `--image-env`
