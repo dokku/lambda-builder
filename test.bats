@@ -12,6 +12,7 @@ teardown_file() {
 }
 
 @test "[build] write procfile" {
+  skip "This test does not run correctly in Github Actions due to use of embedded docker"
   run $LAMBDA_BUILDER_BIN build --working-directory tests/go --write-procfile
   echo "output: $output"
   echo "status: $status"
