@@ -11,6 +11,14 @@ teardown_file() {
   make clean
 }
 
+@test "[build] write procfile" {
+  run $LAMBDA_BUILDER_BIN build --working-directory tests/go --write-procfile
+  echo "output: $output"
+  echo "status: $status"
+  [[ "$status" -eq 0 ]]
+  [[ -f tests/go/Procfile ]]
+}
+
 @test "[build] dotnet6" {
   run $LAMBDA_BUILDER_BIN build --working-directory tests/dotnet6
   echo "output: $output"
