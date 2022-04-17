@@ -25,12 +25,14 @@ type Builder interface {
 }
 
 type Config struct {
+	BuildEnv          []string
 	BuildImage        bool
 	BuilderBuildImage string
 	BuilderRunImage   string
 	Handler           string
 	HandlerMap        map[string]string
 	Identifier        string
+	ImageEnv          []string
 	ImageLabels       []string
 	ImageTag          string
 	Port              int
@@ -113,9 +115,12 @@ func executeBuildContainer(tmp string, script string, taskBuildDir string, confi
 		"--name", fmt.Sprintf("lambda-builder-executor-%s", config.Identifier),
 		"--volume", fmt.Sprintf("%s:/tmp/task", config.WorkingDirectory),
 		"--volume", fmt.Sprintf("%s:%s", tmp, taskBuildDir),
-		config.BuilderBuildImage,
-		"/bin/bash", "-c", script,
 	}
+
+	for _, envPair := range config.BuildEnv {
+		args = append(args, "--env", envPair)
+	}
+	args = append(args, config.BuilderBuildImage, "/bin/bash", "-c", script)
 
 	cmd := execute.ExecTask{
 		Args:        args,
@@ -149,6 +154,9 @@ FROM {{ .run_image }}
 ENV DOCKER_LAMBDA_API_PORT={{ .port }}
 ENV DOCKER_LAMBDA_RUNTIME_PORT={{ .port }}
 {{ end }}
+{{range .env}}
+ENV {{.}}
+{{end}}
 {{ if ne .command "" }}
 CMD ["{{ .cmd }}"]
 {{ end }}
@@ -158,8 +166,9 @@ COPY . /var/task
 		return fmt.Errorf("error generating template: %s", err)
 	}
 
-	data := map[string]string{
+	data := map[string]interface{}{
 		"cmd":       cmd,
+		"env":       config.ImageEnv,
 		"port":      strconv.Itoa(config.Port),
 		"run_image": config.BuilderRunImage,
 	}
