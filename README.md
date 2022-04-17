@@ -59,6 +59,20 @@ lambda-builder build --build-image --label com.example/key=value --label com.exa
 lambda-builder build --build-image --tag app/awesome:1234
 ```
 
+A `Procfile` can be written to the working directory by specifying the `--write-procfile` flag. This file will not be written if one already exists in the working directory. If an image is being built, the detected handler will also be injected into the build context and used as the default `CMD` for the image. The contents of the `Procfile` are a `web` process type and a detected handler.
+
+```shell
+# writes out a procfile
+lambda-builder build --write-procfile
+```
+
+A `--handler` flag can be specified with a custom handler to override the one detected.
+
+```shell
+# override with a custom handler
+lambda-builder build --write-procfile --handler foo_file.bar_func
+```
+
 ### How does it work
 
 Internally, `lambda-builder` detects a given language and builds the app according to the script specified by the detected builder within a disposablecontainer environment emulating AWS Lambda. If a builder is not detected, the build will fail. The following languages are supported:
