@@ -44,6 +44,21 @@ Alternatively, a given path can be specified via the `--working-directory` flag:
 lambda-builder build --working-directory path/to/app
 ```
 
+In addition to the `lambda.yml`, a docker image can be produced from the generated artifact by specifying the `--build-image` flag. This also allows for multiple `--label`  flags as well as specifying a single image tag via either `-t` or `--tag`:
+
+```shell
+# will write a lambda.zip in the specified path
+# and generate a docker image named `lambda-builder:$APP:latest`
+# where $APP is the last portion of the working directory
+lambda-builder build --build-image
+
+# adds the labels com.example/key=value and com.example/another-key=value
+lambda-builder build --build-image --label com.example/key=value --label com.example/another-key=value
+
+# tags the image as app/awesome:1234
+lambda-builder build --build-image --tag app/awesome:1234
+```
+
 ### How does it work
 
 Internally, `lambda-builder` detects a given language and builds the app according to the script specified by the detected builder within a disposablecontainer environment emulating AWS Lambda. If a builder is not detected, the build will fail. The following languages are supported:
@@ -80,16 +95,22 @@ Internally, `lambda-builder` detects a given language and builds the app accordi
 
 When the app is built, a `lambda.zip` will be produced in the specified working directory. The resulting `lambda.zip` can be uploaded to S3 and used within a Lambda function.
 
-Both the builder and the build image environment can be overriden in an optional `lambda.yml` file in the specified working directory. An example of this file is as follows:
+Both the builder and the build image environment can be overriden in an optional `lambda.yml` file in the specified working directory.
+
+### `lambda.yml`
+
+The following a short description of the `lambda.yml` format.
 
 ```yaml
 ---
 build_image: mlupin/docker-lambda:dotnetcore3.1-build
 builder: dotnet
+run_image: mlupin/docker-lambda:dotnetcore3.1
 ```
 
 - `build_image`: A docker image that is accessible by the docker daemon. The `build_image` _should_ be based on an existing Lambda image - builders may fail if they cannot run within the specified `build_image`. The build will fail if the image is inaccessible by the docker daemon.
 - `builder`: The name of a builder. This may be used if multiple builders match and a specific builder is desired. If an invalid builder is specified, the build will fail.
+- `run_image`: A docker image that is accessible by the docker daemon. The `run_image` _should_ be based on an existing Lambda image - built images may fail to start if they are not compatible with the produced artifact. The generation of the `run` iage will fail if the image is inaccessible by the docker daemon.
 
 ### Deploying
 

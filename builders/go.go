@@ -8,7 +8,12 @@ type GoBuilder struct {
 
 func NewGoBuilder(config Config) (GoBuilder, error) {
 	var err error
-	config.BuildImage, err = getBuilder(config, "lambci/lambda:build-go1.x")
+	config.BuilderBuildImage, err = getBuildImage(config, "lambci/lambda:build-go1.x")
+	if err != nil {
+		return GoBuilder{}, err
+	}
+
+	config.BuilderRunImage, err = getRunImage(config, "mlupin/docker-lambda:provided.al2")
 	if err != nil {
 		return GoBuilder{}, err
 	}
@@ -19,11 +24,7 @@ func NewGoBuilder(config Config) (GoBuilder, error) {
 }
 
 func (b GoBuilder) BuildImage() string {
-	return b.Config.BuildImage
-}
-
-func (b GoBuilder) GetConfig() Config {
-	return b.Config
+	return b.Config.BuilderBuildImage
 }
 
 func (b GoBuilder) Detect() bool {
@@ -35,7 +36,15 @@ func (b GoBuilder) Detect() bool {
 }
 
 func (b GoBuilder) Execute() error {
-	return executeBuilder(b.script(), b.Config)
+	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b GoBuilder) GetConfig() Config {
+	return b.Config
+}
+
+func (b GoBuilder) GetTaskBuildDir() string {
+	return "/go/src/handler"
 }
 
 func (b GoBuilder) Name() string {

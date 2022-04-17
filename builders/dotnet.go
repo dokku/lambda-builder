@@ -8,7 +8,12 @@ type DotnetBuilder struct {
 
 func NewDotnetBuilder(config Config) (DotnetBuilder, error) {
 	var err error
-	config.BuildImage, err = getBuilder(config, "mlupin/docker-lambda:dotnet6-build")
+	config.BuilderBuildImage, err = getBuildImage(config, "mlupin/docker-lambda:dotnet6-build")
+	if err != nil {
+		return DotnetBuilder{}, err
+	}
+
+	config.BuilderRunImage, err = getRunImage(config, "mlupin/docker-lambda:dotnet6")
 	if err != nil {
 		return DotnetBuilder{}, err
 	}
@@ -19,11 +24,7 @@ func NewDotnetBuilder(config Config) (DotnetBuilder, error) {
 }
 
 func (b DotnetBuilder) BuildImage() string {
-	return b.Config.BuildImage
-}
-
-func (b DotnetBuilder) GetConfig() Config {
-	return b.Config
+	return b.Config.BuilderBuildImage
 }
 
 func (b DotnetBuilder) Detect() bool {
@@ -35,7 +36,15 @@ func (b DotnetBuilder) Detect() bool {
 }
 
 func (b DotnetBuilder) Execute() error {
-	return executeBuilder(b.script(), b.Config)
+	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b DotnetBuilder) GetConfig() Config {
+	return b.Config
+}
+
+func (b DotnetBuilder) GetTaskBuildDir() string {
+	return "/var/task"
 }
 
 func (b DotnetBuilder) Name() string {

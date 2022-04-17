@@ -8,7 +8,12 @@ type NodejsBuilder struct {
 
 func NewNodejsBuilder(config Config) (NodejsBuilder, error) {
 	var err error
-	config.BuildImage, err = getBuilder(config, "mlupin/docker-lambda:nodejs14.x-build")
+	config.BuilderBuildImage, err = getBuildImage(config, "mlupin/docker-lambda:nodejs14.x-build")
+	if err != nil {
+		return NodejsBuilder{}, err
+	}
+
+	config.BuilderRunImage, err = getRunImage(config, "mlupin/docker-lambda:nodejs14.x")
 	if err != nil {
 		return NodejsBuilder{}, err
 	}
@@ -19,11 +24,7 @@ func NewNodejsBuilder(config Config) (NodejsBuilder, error) {
 }
 
 func (b NodejsBuilder) BuildImage() string {
-	return b.Config.BuildImage
-}
-
-func (b NodejsBuilder) GetConfig() Config {
-	return b.Config
+	return b.Config.BuilderBuildImage
 }
 
 func (b NodejsBuilder) Detect() bool {
@@ -35,7 +36,15 @@ func (b NodejsBuilder) Detect() bool {
 }
 
 func (b NodejsBuilder) Execute() error {
-	return executeBuilder(b.script(), b.Config)
+	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b NodejsBuilder) GetConfig() Config {
+	return b.Config
+}
+
+func (b NodejsBuilder) GetTaskBuildDir() string {
+	return "/var/task"
 }
 
 func (b NodejsBuilder) Name() string {

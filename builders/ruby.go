@@ -8,7 +8,12 @@ type RubyBuilder struct {
 
 func NewRubyBuilder(config Config) (RubyBuilder, error) {
 	var err error
-	config.BuildImage, err = getBuilder(config, "mlupin/docker-lambda:ruby2.7-build")
+	config.BuilderBuildImage, err = getBuildImage(config, "mlupin/docker-lambda:ruby2.7-build")
+	if err != nil {
+		return RubyBuilder{}, err
+	}
+
+	config.BuilderRunImage, err = getRunImage(config, "mlupin/docker-lambda:ruby2.7")
 	if err != nil {
 		return RubyBuilder{}, err
 	}
@@ -19,11 +24,7 @@ func NewRubyBuilder(config Config) (RubyBuilder, error) {
 }
 
 func (b RubyBuilder) BuildImage() string {
-	return b.Config.BuildImage
-}
-
-func (b RubyBuilder) GetConfig() Config {
-	return b.Config
+	return b.Config.BuilderBuildImage
 }
 
 func (b RubyBuilder) Detect() bool {
@@ -34,8 +35,16 @@ func (b RubyBuilder) Detect() bool {
 	return false
 }
 
+func (b RubyBuilder) GetConfig() Config {
+	return b.Config
+}
+
+func (b RubyBuilder) GetTaskBuildDir() string {
+	return "/var/task"
+}
+
 func (b RubyBuilder) Execute() error {
-	return executeBuilder(b.script(), b.Config)
+	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
 }
 
 func (b RubyBuilder) Name() string {
