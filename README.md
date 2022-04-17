@@ -55,33 +55,33 @@ lambda-builder build --build-env KEY=VALUE --build-env ANOTHER_KEY=some-value
 
 #### Building an image
 
-A docker image can be produced from the generated artifact by specifying the `--build-image` flag. This also allows for multiple `--label`  flags as well as specifying a single image tag via either `-t` or `--tag`:
+A docker image can be produced from the generated artifact by specifying the `--generate-image` flag. This also allows for multiple `--label`  flags as well as specifying a single image tag via either `-t` or `--tag`:
 
 ```shell
 # will write a lambda.zip in the specified path
 # and generate a docker image named `lambda-builder:$APP:latest`
 # where $APP is the last portion of the working directory
-lambda-builder build --build-image
+lambda-builder build --generate-image
 
 # adds the labels com.example/key=value and com.example/another-key=value
-lambda-builder build --build-image --label com.example/key=value --label com.example/another-key=value
+lambda-builder build --generate-image --label com.example/key=value --label com.example/another-key=value
 
 # tags the image as app/awesome:1234
-lambda-builder build --build-image --tag app/awesome:1234
+lambda-builder build --generate-image --tag app/awesome:1234
 ```
 
 By default, any web process started by the built image starts on port `9001`. This can be overriden via the `--port` environment variable.
 
 ```shell
 # build the image and ensure it starts on port 5000 by default
-lambda-builder build --build-image --port 5000
+lambda-builder build --generate-image --port 5000
 ````
 
 Custom environment variables can be supplied for the built image by specifying one or more `--image-env` flags. The `--image-env` flag takes `KEY=VALUE` pairs.
 
 ```shell
 # the built image will have `ENV` directives corresponding to the values specified by `--image-env`
-lambda-builder build --build-image --image-env KEY=VALUE --image-env ANOTHER_KEY=some-value
+lambda-builder build --generate-image --image-env KEY=VALUE --image-env ANOTHER_KEY=some-value
 ```
 
 #### Generating a Procfile

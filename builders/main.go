@@ -26,7 +26,7 @@ type Builder interface {
 
 type Config struct {
 	BuildEnv          []string
-	BuildImage        bool
+	GenerateImage     bool
 	BuilderBuildImage string
 	BuilderRunImage   string
 	Handler           string
@@ -89,7 +89,7 @@ func executeBuilder(script string, taskBuildDir string, config Config) error {
 		}
 	}
 
-	if config.BuildImage {
+	if config.GenerateImage {
 		fmt.Printf("=====> Building image\n")
 		fmt.Printf("       Generating temporary Dockerfile\n")
 		if err := generateDockerfile(handler, tmp, config); err != nil {
