@@ -20,7 +20,7 @@ type BuildCommand struct {
 	command.Meta
 
 	buildEnv         []string
-	buildImage       bool
+	generateImage    bool
 	handler          string
 	imageEnv         []string
 	imageTag         string
@@ -70,7 +70,7 @@ func (c *BuildCommand) FlagSet() *flag.FlagSet {
 	}
 
 	f := c.Meta.FlagSet(c.Name(), command.FlagSetClient)
-	f.BoolVar(&c.buildImage, "build-image", false, "build a docker image")
+	f.BoolVar(&c.generateImage, "generate-image", false, "build a docker image")
 	f.BoolVar(&c.quiet, "quiet", false, "run builder in quiet mode")
 	f.BoolVar(&c.writeProcfile, "write-procfile", false, "writes a Procfile if a handler is specified or detected")
 	f.IntVar(&c.port, "port", -1, "set the default port for the lambda to listen on")
@@ -88,7 +88,7 @@ func (c *BuildCommand) AutocompleteFlags() complete.Flags {
 		c.Meta.AutocompleteFlags(command.FlagSetClient),
 		complete.Flags{
 			"--build-env":      complete.PredictAnything,
-			"--build-image":    complete.PredictNothing,
+			"--generate-image": complete.PredictNothing,
 			"--image-env":      complete.PredictAnything,
 			"--port":           complete.PredictAnything,
 			"--quiet":          complete.PredictNothing,
@@ -132,7 +132,7 @@ func (c *BuildCommand) Run(args []string) int {
 	identifier := uuid.New().String()
 	config := builders.Config{
 		BuildEnv:         c.buildEnv,
-		BuildImage:       c.buildImage,
+		GenerateImage:    c.generateImage,
 		Identifier:       identifier,
 		ImageEnv:         c.imageEnv,
 		ImageLabels:      c.labels,
