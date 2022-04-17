@@ -21,14 +21,19 @@ type PythonBuilder struct {
 func NewPythonBuilder(config Config) (PythonBuilder, error) {
 	var err error
 	version := "3.9"
-	if config.BuildImage == "" {
+	if config.BuilderBuildImage == "" || config.BuilderRunImage == "" {
 		version, err = parsePythonVersion(config.WorkingDirectory, []string{"3.8", "3.9"})
 		if err != nil {
 			return PythonBuilder{}, err
 		}
 	}
 
-	config.BuildImage, err = getBuilder(config, fmt.Sprintf("mlupin/docker-lambda:python%s-build", version))
+	config.BuilderBuildImage, err = getBuildImage(config, fmt.Sprintf("mlupin/docker-lambda:python%s-build", version))
+	if err != nil {
+		return PythonBuilder{}, err
+	}
+
+	config.BuilderRunImage, err = getRunImage(config, fmt.Sprintf("mlupin/docker-lambda:python%s", version))
 	if err != nil {
 		return PythonBuilder{}, err
 	}
@@ -39,11 +44,7 @@ func NewPythonBuilder(config Config) (PythonBuilder, error) {
 }
 
 func (b PythonBuilder) BuildImage() string {
-	return b.Config.BuildImage
-}
-
-func (b PythonBuilder) GetConfig() Config {
-	return b.Config
+	return b.Config.BuilderBuildImage
 }
 
 func (b PythonBuilder) Detect() bool {
@@ -63,7 +64,15 @@ func (b PythonBuilder) Detect() bool {
 }
 
 func (b PythonBuilder) Execute() error {
-	return executeBuilder(b.script(), b.Config)
+	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b PythonBuilder) GetConfig() Config {
+	return b.Config
+}
+
+func (b PythonBuilder) GetTaskBuildDir() string {
+	return "/var/task"
 }
 
 func (b PythonBuilder) Name() string {

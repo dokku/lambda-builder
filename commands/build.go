@@ -19,6 +19,9 @@ import (
 type BuildCommand struct {
 	command.Meta
 
+	buildImage       bool
+	imageTag         string
+	labels           []string
 	quiet            bool
 	workingDirectory string
 }
@@ -63,7 +66,10 @@ func (c *BuildCommand) FlagSet() *flag.FlagSet {
 
 	f := c.Meta.FlagSet(c.Name(), command.FlagSetClient)
 	f.BoolVar(&c.quiet, "quiet", false, "run builder in quiet mode")
+	f.BoolVar(&c.buildImage, "build-image", false, "build a docker image")
+	f.StringVarP(&c.imageTag, "tag", "t", "", "name and optionally a tag in the 'name:tag' format")
 	f.StringVar(&c.workingDirectory, "working-directory", workingDirectory, "working directory")
+	f.StringArrayVar(&c.labels, "label", []string{}, " set metadata for an image")
 	return f
 }
 
@@ -71,8 +77,8 @@ func (c *BuildCommand) AutocompleteFlags() complete.Flags {
 	return command.MergeAutocompleteFlags(
 		c.Meta.AutocompleteFlags(command.FlagSetClient),
 		complete.Flags{
-			"--count": complete.PredictNothing,
-			"--quiet": complete.PredictNothing,
+			"--build-image": complete.PredictNothing,
+			"--quiet":       complete.PredictNothing,
 		},
 	)
 }
@@ -111,7 +117,10 @@ func (c *BuildCommand) Run(args []string) int {
 
 	identifier := uuid.New().String()
 	config := builders.Config{
+		BuildImage:       c.buildImage,
 		Identifier:       identifier,
+		ImageLabels:      c.labels,
+		ImageTag:         c.imageTag,
 		RunQuiet:         c.quiet,
 		WorkingDirectory: c.workingDirectory,
 	}
