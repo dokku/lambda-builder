@@ -1,6 +1,6 @@
 # lambda-builder
 
-A tool for building lamda functions into uploadable zip files via Docker.
+A tool for building lamda functions into uploadable zip files via Docker based on work from [@lambci](https://github.com/lambci/docker-lambda) and [@mLupine](https://github.com/mLupine/docker-lambda).
 
 ## Building
 
