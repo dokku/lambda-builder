@@ -20,3 +20,33 @@ func FolderExists(directory string) bool {
 
 	return info.IsDir()
 }
+
+func FileSize(filepath string) (int64, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return 0, err
+	}
+	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return 0, err
+	}
+
+	return stat.Size(), nil
+}
+
+func BytesToKilobytes(size int64) int64 {
+	var kilobytes int64
+	kilobytes = (size / 1024)
+	return kilobytes
+}
+
+func BytesToMegabytes(size int64) int64 {
+	var kilobytes int64
+	kilobytes = (size / 1024)
+
+	var megabytes int64
+	megabytes = (kilobytes / 1024)
+	return megabytes
+}

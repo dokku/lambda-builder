@@ -8,7 +8,12 @@ type GoBuilder struct {
 
 func NewGoBuilder(config Config) (GoBuilder, error) {
 	var err error
-	config.BuildImage, err = getBuilder(config, "lambci/lambda:build-go1.x")
+	config.BuilderBuildImage, err = getBuildImage(config, "lambci/lambda:build-go1.x")
+	if err != nil {
+		return GoBuilder{}, err
+	}
+
+	config.BuilderRunImage, err = getRunImage(config, "mlupin/docker-lambda:provided.al2")
 	if err != nil {
 		return GoBuilder{}, err
 	}
@@ -16,14 +21,6 @@ func NewGoBuilder(config Config) (GoBuilder, error) {
 	return GoBuilder{
 		Config: config,
 	}, nil
-}
-
-func (b GoBuilder) BuildImage() string {
-	return b.Config.BuildImage
-}
-
-func (b GoBuilder) GetConfig() Config {
-	return b.Config
 }
 
 func (b GoBuilder) Detect() bool {
@@ -35,7 +32,26 @@ func (b GoBuilder) Detect() bool {
 }
 
 func (b GoBuilder) Execute() error {
-	return executeBuilder(b.script(), b.Config)
+	b.Config.HandlerMap = b.GetHandlerMap()
+	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b GoBuilder) GetBuildImage() string {
+	return b.Config.BuilderBuildImage
+}
+
+func (b GoBuilder) GetConfig() Config {
+	return b.Config
+}
+
+func (b GoBuilder) GetHandlerMap() map[string]string {
+	return map[string]string{
+		"bootstrap": "bootstrap",
+	}
+}
+
+func (b GoBuilder) GetTaskBuildDir() string {
+	return "/go/src/handler"
 }
 
 func (b GoBuilder) Name() string {
@@ -67,6 +83,26 @@ install-gomod() {
   go build -o bootstrap main.go 2>&1 | indent
 }
 
+hook-pre-compile() {
+  if [[ ! -f bin/pre_compile ]]; then
+    return
+  fi
+
+  puts-step "Running pre-compile hook"
+  chmod +x bin/pre_compile
+  bin/pre_compile
+}
+
+hook-post-compile() {
+  if [[ ! -f bin/post_compile ]]; then
+    return
+  fi
+
+  puts-step "Running post-compile hook"
+  chmod +x bin/post_compile
+  bin/post_compile
+}
+
 hook-package() {
   if [[ "$LAMBDA_BUILD_ZIP" != "1" ]]; then
     return
@@ -75,10 +111,13 @@ hook-package() {
   puts-step "Creating package at lambda.zip"
   zip -q -r lambda.zip bootstrap
   mv lambda.zip /tmp/task/lambda.zip
+  rm -rf lambda.zip
 }
 
 cp -a /tmp/task/. /go/src/handler
+hook-pre-compile
 install-gomod
+hook-post-compile
 hook-package
 `
 }

@@ -21,14 +21,19 @@ type PythonBuilder struct {
 func NewPythonBuilder(config Config) (PythonBuilder, error) {
 	var err error
 	version := "3.9"
-	if config.BuildImage == "" {
+	if config.BuilderBuildImage == "" || config.BuilderRunImage == "" {
 		version, err = parsePythonVersion(config.WorkingDirectory, []string{"3.8", "3.9"})
 		if err != nil {
 			return PythonBuilder{}, err
 		}
 	}
 
-	config.BuildImage, err = getBuilder(config, fmt.Sprintf("mlupin/docker-lambda:python%s-build", version))
+	config.BuilderBuildImage, err = getBuildImage(config, fmt.Sprintf("mlupin/docker-lambda:python%s-build", version))
+	if err != nil {
+		return PythonBuilder{}, err
+	}
+
+	config.BuilderRunImage, err = getRunImage(config, fmt.Sprintf("mlupin/docker-lambda:python%s", version))
 	if err != nil {
 		return PythonBuilder{}, err
 	}
@@ -36,14 +41,6 @@ func NewPythonBuilder(config Config) (PythonBuilder, error) {
 	return PythonBuilder{
 		Config: config,
 	}, nil
-}
-
-func (b PythonBuilder) BuildImage() string {
-	return b.Config.BuildImage
-}
-
-func (b PythonBuilder) GetConfig() Config {
-	return b.Config
 }
 
 func (b PythonBuilder) Detect() bool {
@@ -63,7 +60,29 @@ func (b PythonBuilder) Detect() bool {
 }
 
 func (b PythonBuilder) Execute() error {
-	return executeBuilder(b.script(), b.Config)
+	b.Config.HandlerMap = b.GetHandlerMap()
+	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+}
+
+func (b PythonBuilder) GetBuildImage() string {
+	return b.Config.BuilderBuildImage
+}
+
+func (b PythonBuilder) GetConfig() Config {
+	return b.Config
+}
+
+func (b PythonBuilder) GetHandlerMap() map[string]string {
+	return map[string]string{
+		"app.py":             "app.handler",
+		"function.py":        "function.handler",
+		"lambda_function.py": "lambda_function.handler",
+		"main.py":            "main.handler",
+	}
+}
+
+func (b PythonBuilder) GetTaskBuildDir() string {
+	return "/var/task"
 }
 
 func (b PythonBuilder) Name() string {
@@ -138,6 +157,26 @@ cleanup-deps() {
   rm -rf /var/task/.venv
 }
 
+hook-pre-compile() {
+  if [[ ! -f bin/pre_compile ]]; then
+    return
+  fi
+
+  puts-step "Running pre-compile hook"
+  chmod +x bin/pre_compile
+  bin/pre_compile
+}
+
+hook-post-compile() {
+  if [[ ! -f bin/post_compile ]]; then
+    return
+  fi
+
+  puts-step "Running post-compile hook"
+  chmod +x bin/post_compile
+  bin/post_compile
+}
+
 hook-package() {
   if [[ "$LAMBDA_BUILD_ZIP" != "1" ]]; then
     return
@@ -146,9 +185,11 @@ hook-package() {
   puts-step "Creating package at lambda.zip"
   zip -q -r lambda.zip ./*
   mv lambda.zip /tmp/task/lambda.zip
+  rm -rf lambda.zip
 }
 
 cp -a /tmp/task/. /var/task
+hook-pre-compile
 
 if [[ -f "requirements.txt" ]]; then
   install-pip
@@ -162,6 +203,7 @@ else
 fi
 
 cleanup-deps
+hook-post-compile
 hook-package
 `
 }

@@ -19,8 +19,16 @@ import (
 type BuildCommand struct {
 	command.Meta
 
+	buildEnv         []string
+	generateImage    bool
+	handler          string
+	imageEnv         []string
+	imageTag         string
+	labels           []string
+	port             int
 	quiet            bool
 	workingDirectory string
+	writeProcfile    bool
 }
 
 func (c *BuildCommand) Name() string {
@@ -62,8 +70,16 @@ func (c *BuildCommand) FlagSet() *flag.FlagSet {
 	}
 
 	f := c.Meta.FlagSet(c.Name(), command.FlagSetClient)
+	f.BoolVar(&c.generateImage, "generate-image", false, "build a docker image")
 	f.BoolVar(&c.quiet, "quiet", false, "run builder in quiet mode")
+	f.BoolVar(&c.writeProcfile, "write-procfile", false, "writes a Procfile if a handler is specified or detected")
+	f.IntVar(&c.port, "port", -1, "set the default port for the lambda to listen on")
+	f.StringVar(&c.handler, "handler", "", "handler override to specify as the default command to run in a built image")
+	f.StringVarP(&c.imageTag, "tag", "t", "", "name and optionally a tag in the 'name:tag' format")
 	f.StringVar(&c.workingDirectory, "working-directory", workingDirectory, "working directory")
+	f.StringArrayVar(&c.buildEnv, "build-env", []string{}, "environment variables to be set for the build context")
+	f.StringArrayVar(&c.imageEnv, "image-env", []string{}, "environment variables to be committed to a built image")
+	f.StringArrayVar(&c.labels, "label", []string{}, "set metadata for an image")
 	return f
 }
 
@@ -71,8 +87,17 @@ func (c *BuildCommand) AutocompleteFlags() complete.Flags {
 	return command.MergeAutocompleteFlags(
 		c.Meta.AutocompleteFlags(command.FlagSetClient),
 		complete.Flags{
-			"--count": complete.PredictNothing,
-			"--quiet": complete.PredictNothing,
+			"--build-env":         complete.PredictAnything,
+			"--generate-image":    complete.PredictNothing,
+			"--handler":           complete.PredictAnything,
+			"--image-env":         complete.PredictAnything,
+			"--label":             complete.PredictAnything,
+			"--port":              complete.PredictAnything,
+			"--quiet":             complete.PredictNothing,
+			"-t":                  complete.PredictAnything,
+			"--tag":               complete.PredictAnything,
+			"--working-directory": complete.PredictAnything,
+			"--write-procfile":    complete.PredictNothing,
 		},
 	)
 }
@@ -111,8 +136,15 @@ func (c *BuildCommand) Run(args []string) int {
 
 	identifier := uuid.New().String()
 	config := builders.Config{
+		BuildEnv:         c.buildEnv,
+		GenerateImage:    c.generateImage,
 		Identifier:       identifier,
+		ImageEnv:         c.imageEnv,
+		ImageLabels:      c.labels,
+		ImageTag:         c.imageTag,
+		Port:             c.port,
 		RunQuiet:         c.quiet,
+		WriteProcfile:    c.writeProcfile,
 		WorkingDirectory: c.workingDirectory,
 	}
 
@@ -125,13 +157,28 @@ func (c *BuildCommand) Run(args []string) int {
 
 	c.Ui.Info(fmt.Sprintf("Detected %s builder", builder.Name()))
 
-	logger.LogHeader1(fmt.Sprintf("Building app with image %s", builder.BuildImage()))
+	logger.LogHeader1(fmt.Sprintf("Building app with image %s", builder.GetBuildImage()))
 	if err := builder.Execute(); err != nil {
 		c.Ui.Error(err.Error())
 		return 1
 	}
 
-	logger.LogHeader1(fmt.Sprintf("Wrote %s", filepath.Join(c.workingDirectory, "lambda.zip")))
+	zipPath := filepath.Join(c.workingDirectory, "lambda.zip")
+	logger.LogHeader1(fmt.Sprintf("Wrote %s", zipPath))
+	sizeInBytes, err := io.FileSize(zipPath)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("Error getting filesize for %s: %s", zipPath, err.Error()))
+		return 1
+	}
+
+	sizeInKB := io.BytesToKilobytes(sizeInBytes)
+	sizeInMB := io.BytesToMegabytes(sizeInBytes)
+	if sizeInMB >= 50 {
+		c.Ui.Warn(fmt.Sprintf("Surpassed AWS Lambda 50MB zip file limit: %dMB (%dKB)", sizeInMB, sizeInKB))
+		c.Ui.Warn("Consider using Docker Images for lambda function distribution")
+	} else {
+		c.Ui.Info(fmt.Sprintf("Current zip file size: %dMB (%dKB)", sizeInMB, sizeInKB))
+	}
 
 	return 0
 }
