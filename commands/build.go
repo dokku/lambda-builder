@@ -131,7 +131,22 @@ func (c *BuildCommand) Run(args []string) int {
 		return 1
 	}
 
-	logger.LogHeader1(fmt.Sprintf("Wrote %s", filepath.Join(c.workingDirectory, "lambda.zip")))
+	zipPath := filepath.Join(c.workingDirectory, "lambda.zip")
+	logger.LogHeader1(fmt.Sprintf("Wrote %s", zipPath))
+	sizeInBytes, err := io.FileSize(zipPath)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("Error getting filesize for %s: %s", zipPath, err.Error()))
+		return 1
+	}
+
+	sizeInKB := io.BytesToKilobytes(sizeInBytes)
+	sizeInMB := io.BytesToMegabytes(sizeInBytes)
+	if sizeInMB >= 50 {
+		c.Ui.Warn(fmt.Sprintf("Surpassed AWS Lambda 50MB zip file limit: %dMB (%dKB)", sizeInMB, sizeInKB))
+		c.Ui.Warn("Consider using Docker Images for lambda function distribution")
+	} else {
+		c.Ui.Info(fmt.Sprintf("Current zip file size: %dMB (%dKB)", sizeInMB, sizeInKB))
+	}
 
 	return 0
 }
