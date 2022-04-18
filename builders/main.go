@@ -26,9 +26,10 @@ type Builder interface {
 
 type Config struct {
 	BuildEnv          []string
-	GenerateImage     bool
+	Builder           string
 	BuilderBuildImage string
 	BuilderRunImage   string
+	GenerateImage     bool
 	Handler           string
 	HandlerMap        map[string]string
 	Identifier        string
@@ -37,8 +38,8 @@ type Config struct {
 	ImageTag          string
 	Port              int
 	RunQuiet          bool
-	WriteProcfile     bool
 	WorkingDirectory  string
+	WriteProcfile     bool
 }
 
 func (c Config) GetImageTag() string {

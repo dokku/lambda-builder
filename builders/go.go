@@ -24,7 +24,11 @@ func NewGoBuilder(config Config) (GoBuilder, error) {
 }
 
 func (b GoBuilder) Detect() bool {
-	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "go.sum") {
+	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "go.mod") {
+		return true
+	}
+
+	if io.FileExistsInDirectory(b.Config.WorkingDirectory, "main.go") {
 		return true
 	}
 
@@ -76,8 +80,13 @@ puts-step() {
 }
 
 install-gomod() {
-  puts-step "Downloading dependencies via go mod"
-  go mod download 2>&1 | indent
+  if [[ -f "go.mod" ]]; then
+    puts-step "Downloading dependencies via go mod"
+    go mod download 2>&1 | indent
+  else
+    puts-step "Missing go.mod, downloading dependencies via go get"
+    go get
+  fi
 
   puts-step "Compiling via go build"
   go build -o bootstrap main.go 2>&1 | indent

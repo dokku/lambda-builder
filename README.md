@@ -15,7 +15,7 @@ I don't want to go through the motions of figuring out the correct way to build 
 
 ```shell
 # substitute the version number as desired
-go build -ldflags "-X main.Version=0.2.0
+go build -ldflags "-X main.Version=0.3.0
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ Available commands are:
     version    Return the version of the binary
 ```
 
-### Building an image
+### Building an app
 
 To build an app:
 
@@ -52,6 +52,12 @@ Custom environment variables can be supplied for the build environment by specif
 # the build step will have access to both the --build-env pairs
 lambda-builder build --build-env KEY=VALUE --build-env ANOTHER_KEY=some-value
 ```
+
+A `builder` can be chosen by a flag. Note that while a `builder` may be selected, the detection for that builder must still pass in order for the build to succeed.
+
+```shell
+lambda-builder build --generate-image --builder dotnet
+````
 
 #### Building an image
 
@@ -84,6 +90,27 @@ Custom environment variables can be supplied for the built image by specifying o
 lambda-builder build --generate-image --image-env KEY=VALUE --image-env ANOTHER_KEY=some-value
 ```
 
+The `build-image` and `run-image` can also be specified as flags:
+
+```shell
+lambda-builder build --generate-image --build-image "mlupin/docker-lambda:dotnetcore3.1-build" --run-image "mlupin/docker-lambda:dotnetcore3.1"
+````
+
+A generated image can be run locally with the following line:
+
+```shell
+# run the container and ensure it stays open
+# replace `$APP` with your folder name
+docker run --rm -it -e DOCKER_LAMBDA_STAY_OPEN=1 -p 9001:9001 "lambda-builder:$APP:latest"
+
+# invoke it using the awscli (v2)
+# note that the function name in this example is `function.handler`
+aws lambda invoke --endpoint http://localhost:9001 --no-sign-request --function-name function.handler --payload '{}' --cli-binary-format raw-in-base64-out output.json
+
+# invoke it via curl
+curl -d '{}' http://localhost:9001/2015-03-31/functions/function.handler/invocations
+```
+
 #### Generating a Procfile
 
 A `Procfile` can be written to the working directory by specifying the `--write-procfile` flag. This file will not be written if one already exists in the working directory. If an image is being built, the detected handler will also be injected into the build context and used as the default `CMD` for the image. The contents of the `Procfile` are a `web` process type and a detected handler.
@@ -112,7 +139,7 @@ Internally, `lambda-builder` detects a given language and builds the app accordi
     - dotnetcore3.1
 - `go`
   - default build image: `lambci/lambda:build-go1.x`
-  - requirement: `go.mod`
+  - requirement: `go.mod` or `main.go`
   - runtimes:
     - provided.al2
 - `nodejs`
