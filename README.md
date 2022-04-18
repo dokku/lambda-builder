@@ -15,7 +15,7 @@ I don't want to go through the motions of figuring out the correct way to build 
 
 ```shell
 # substitute the version number as desired
-go build -ldflags "-X main.Version=0.2.0
+go build -ldflags "-X main.Version=0.3.0
 ```
 
 ## Usage
