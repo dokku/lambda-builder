@@ -20,6 +20,8 @@ type BuildCommand struct {
 	command.Meta
 
 	buildEnv         []string
+	builder          string
+	buildImage       string
 	generateImage    bool
 	handler          string
 	imageEnv         []string
@@ -27,6 +29,7 @@ type BuildCommand struct {
 	labels           []string
 	port             int
 	quiet            bool
+	runImage         string
 	workingDirectory string
 	writeProcfile    bool
 }
@@ -74,9 +77,12 @@ func (c *BuildCommand) FlagSet() *flag.FlagSet {
 	f.BoolVar(&c.quiet, "quiet", false, "run builder in quiet mode")
 	f.BoolVar(&c.writeProcfile, "write-procfile", false, "writes a Procfile if a handler is specified or detected")
 	f.IntVar(&c.port, "port", -1, "set the default port for the lambda to listen on")
+	f.StringVar(&c.builder, "builder", "", "set the builder to use")
+	f.StringVar(&c.buildImage, "build-image", "", "set the build-image to use")
 	f.StringVar(&c.handler, "handler", "", "handler override to specify as the default command to run in a built image")
-	f.StringVarP(&c.imageTag, "tag", "t", "", "name and optionally a tag in the 'name:tag' format")
+	f.StringVar(&c.runImage, "run-image", "", "set the run-image to use")
 	f.StringVar(&c.workingDirectory, "working-directory", workingDirectory, "working directory")
+	f.StringVarP(&c.imageTag, "tag", "t", "", "name and optionally a tag in the 'name:tag' format")
 	f.StringArrayVar(&c.buildEnv, "build-env", []string{}, "environment variables to be set for the build context")
 	f.StringArrayVar(&c.imageEnv, "image-env", []string{}, "environment variables to be committed to a built image")
 	f.StringArrayVar(&c.labels, "label", []string{}, "set metadata for an image")
@@ -88,12 +94,15 @@ func (c *BuildCommand) AutocompleteFlags() complete.Flags {
 		c.Meta.AutocompleteFlags(command.FlagSetClient),
 		complete.Flags{
 			"--build-env":         complete.PredictAnything,
+			"--build-image":       complete.PredictAnything,
+			"--builder":           complete.PredictSet("dotnet", "go", "nodejs", "python", "ruby"),
 			"--generate-image":    complete.PredictNothing,
 			"--handler":           complete.PredictAnything,
 			"--image-env":         complete.PredictAnything,
 			"--label":             complete.PredictAnything,
 			"--port":              complete.PredictAnything,
 			"--quiet":             complete.PredictNothing,
+			"--run-image":         complete.PredictAnything,
 			"-t":                  complete.PredictAnything,
 			"--tag":               complete.PredictAnything,
 			"--working-directory": complete.PredictAnything,
@@ -136,16 +145,19 @@ func (c *BuildCommand) Run(args []string) int {
 
 	identifier := uuid.New().String()
 	config := builders.Config{
-		BuildEnv:         c.buildEnv,
-		GenerateImage:    c.generateImage,
-		Identifier:       identifier,
-		ImageEnv:         c.imageEnv,
-		ImageLabels:      c.labels,
-		ImageTag:         c.imageTag,
-		Port:             c.port,
-		RunQuiet:         c.quiet,
-		WriteProcfile:    c.writeProcfile,
-		WorkingDirectory: c.workingDirectory,
+		BuildEnv:          c.buildEnv,
+		Builder:           c.builder,
+		BuilderBuildImage: c.buildImage,
+		BuilderRunImage:   c.runImage,
+		GenerateImage:     c.generateImage,
+		Identifier:        identifier,
+		ImageEnv:          c.imageEnv,
+		ImageLabels:       c.labels,
+		ImageTag:          c.imageTag,
+		Port:              c.port,
+		RunQuiet:          c.quiet,
+		WorkingDirectory:  c.workingDirectory,
+		WriteProcfile:     c.writeProcfile,
 	}
 
 	logger.LogHeader1("Detecting builder")
@@ -223,8 +235,12 @@ func detectBuilder(config builders.Config) (builders.Builder, error) {
 	}
 	bs = append(bs, builder)
 
+	selectedImage := lambdaYML.Builder
+	if config.Builder != "" {
+		selectedImage = config.Builder
+	}
 	for _, builder := range bs {
-		if lambdaYML.Builder != "" && lambdaYML.Builder != builder.Name() {
+		if selectedImage != "" && selectedImage != builder.Name() {
 			continue
 		}
 

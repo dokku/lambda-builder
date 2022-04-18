@@ -53,6 +53,12 @@ Custom environment variables can be supplied for the build environment by specif
 lambda-builder build --build-env KEY=VALUE --build-env ANOTHER_KEY=some-value
 ```
 
+A `builder` can be chosen by a flag. Note that while a `builder` may be selected, the detection for that builder must still pass in order for the build to succeed.
+
+```shell
+lambda-builder build --generate-image --builder dotnet
+````
+
 #### Building an image
 
 A docker image can be produced from the generated artifact by specifying the `--generate-image` flag. This also allows for multiple `--label`  flags as well as specifying a single image tag via either `-t` or `--tag`:
@@ -83,6 +89,12 @@ Custom environment variables can be supplied for the built image by specifying o
 # the built image will have `ENV` directives corresponding to the values specified by `--image-env`
 lambda-builder build --generate-image --image-env KEY=VALUE --image-env ANOTHER_KEY=some-value
 ```
+
+The `build-image` and `run-image` can also be specified as flags:
+
+```shell
+lambda-builder build --generate-image --build-image "mlupin/docker-lambda:dotnetcore3.1-build" --run-image "mlupin/docker-lambda:dotnetcore3.1"
+````
 
 A generated image can be run locally with the following line:
 
