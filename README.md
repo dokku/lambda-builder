@@ -84,6 +84,21 @@ Custom environment variables can be supplied for the built image by specifying o
 lambda-builder build --generate-image --image-env KEY=VALUE --image-env ANOTHER_KEY=some-value
 ```
 
+A generated image can be run locally with the following line:
+
+```shell
+# run the container and ensure it stays open
+# replace `$APP` with your folder name
+docker run --rm -it -e DOCKER_LAMBDA_STAY_OPEN=1 -p 9001:9001 "lambda-builder:$APP:latest"
+
+# invoke it using the awscli (v2)
+# note that the function name in this example is `function.handler`
+aws lambda invoke --endpoint http://localhost:9001 --no-sign-request --function-name function.handler --payload '{}' --cli-binary-format raw-in-base64-out output.json
+
+# invoke it via curl
+curl -d '{}' http://localhost:9001/2015-03-31/functions/function.handler/invocations
+```
+
 #### Generating a Procfile
 
 A `Procfile` can be written to the working directory by specifying the `--write-procfile` flag. This file will not be written if one already exists in the working directory. If an image is being built, the detected handler will also be injected into the build context and used as the default `CMD` for the image. The contents of the `Procfile` are a `web` process type and a detected handler.
