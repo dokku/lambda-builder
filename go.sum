@@ -41,8 +41,8 @@ github.com/huandu/xstrings v1.3.2/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq
 github.com/imdario/mergo v0.3.11/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
 github.com/imdario/mergo v0.3.12 h1:b6R2BslTbIEToALKP7LxUvijTsNI9TAe80pLWN2g/HU=
 github.com/imdario/mergo v0.3.12/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
-github.com/josegonzalez/cli-skeleton v0.4.0 h1:V5CKwN+orkKdnzuHQaiM69IXfGNazCYwQK08xu12Xfs=
-github.com/josegonzalez/cli-skeleton v0.4.0/go.mod h1:pNBybtIE54KcK5IyjVzYoMcPVmIjd+ON02WsrEI4vb0=
+github.com/josegonzalez/cli-skeleton v0.5.0 h1:dmbINLoMXbrl6MZEP52TxLek9uKc3rf2SZttsQhjVJs=
+github.com/josegonzalez/cli-skeleton v0.5.0/go.mod h1:pNBybtIE54KcK5IyjVzYoMcPVmIjd+ON02WsrEI4vb0=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-colorable v0.1.8 h1:c1ghPdyEDarC70ftn0y+A/Ee++9zz8ljHG1b13eJ0s8=
 github.com/mattn/go-colorable v0.1.8/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
