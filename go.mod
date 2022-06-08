@@ -10,7 +10,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/josegonzalez/cli-skeleton v0.5.0
 	github.com/mattn/go-isatty v0.0.14
-	github.com/mitchellh/cli v1.1.3
+	github.com/mitchellh/cli v1.1.4
 	github.com/posener/complete v1.2.3
 	github.com/rs/zerolog v1.27.0
 	github.com/spf13/pflag v1.0.5
