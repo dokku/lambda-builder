@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.1.0
 	github.com/Masterminds/semver v1.5.0
 	github.com/alexellis/go-execute v0.5.0
-	github.com/aws/aws-lambda-go v1.32.0
+	github.com/aws/aws-lambda-go v1.32.1
 	github.com/google/uuid v1.3.0
 	github.com/josegonzalez/cli-skeleton v0.5.0
 	github.com/mattn/go-isatty v0.0.14
@@ -34,9 +34,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
-	github.com/stretchr/testify v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
