@@ -3,7 +3,7 @@ module lambda-builder
 go 1.17
 
 require (
-	github.com/BurntSushi/toml v1.1.0
+	github.com/BurntSushi/toml v1.2.0
 	github.com/Masterminds/semver v1.5.0
 	github.com/alexellis/go-execute v0.5.0
 	github.com/aws/aws-lambda-go v1.32.1
