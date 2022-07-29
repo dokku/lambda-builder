@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.2.0
 	github.com/Masterminds/semver v1.5.0
 	github.com/alexellis/go-execute v0.5.0
-	github.com/aws/aws-lambda-go v1.32.1
+	github.com/aws/aws-lambda-go v1.34.0
 	github.com/google/uuid v1.3.0
 	github.com/josegonzalez/cli-skeleton v0.5.0
 	github.com/mattn/go-isatty v0.0.14
