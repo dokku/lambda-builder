@@ -4,8 +4,7 @@ FROM golang:1.19.0-buster
 RUN apt-get update \
     && apt install apt-transport-https build-essential curl gnupg2 jq lintian rpm rsync rubygems-integration ruby-dev ruby -qy \
     && git clone https://github.com/bats-core/bats-core.git /tmp/bats-core \
-    && cd /tmp/bats-core \
-    && ./install.sh /usr/local \
+    && /tmp/bats-core/install.sh /usr/local \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
