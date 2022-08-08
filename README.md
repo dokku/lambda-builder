@@ -20,7 +20,7 @@ go build -ldflags "-X main.Version=0.3.0
 
 ## Usage
 
-```
+```text
 Usage: lambda-builder [--version] [--help] <command> [<args>]
 
 Available commands are:
