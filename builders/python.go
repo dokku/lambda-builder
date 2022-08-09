@@ -61,7 +61,7 @@ func (b PythonBuilder) Detect() bool {
 
 func (b PythonBuilder) Execute() error {
 	b.Config.HandlerMap = b.GetHandlerMap()
-	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+	return executeBuilder(b.script(), b.Config)
 }
 
 func (b PythonBuilder) GetBuildImage() string {
@@ -79,10 +79,6 @@ func (b PythonBuilder) GetHandlerMap() map[string]string {
 		"lambda_function.py": "lambda_function.handler",
 		"main.py":            "main.handler",
 	}
-}
-
-func (b PythonBuilder) GetTaskBuildDir() string {
-	return "/var/task"
 }
 
 func (b PythonBuilder) Name() string {
@@ -149,10 +145,11 @@ python-major-minor() {
 cleanup-deps() {
   puts-step "Writing dependencies to correct path"
   version="$(python-major-minor)"
+
   find "/var/task/.venv/lib/python${version}/site-packages" -type f -print0 | xargs -0 chmod 644
   find "/var/task/.venv/lib/python${version}/site-packages" -type d -print0 | xargs -0 chmod 755
   pushd "/var/task/.venv/lib/python${version}/site-packages" >/dev/null || return 1
-  cp -a --no-clobber "/var/task/.venv/lib/python${version}/site-packages/." /var/task
+	mv --no-clobber * /var/task/
   popd >/dev/null || return 1
   rm -rf /var/task/.venv
 }
@@ -229,7 +226,7 @@ func parsePythonVersion(workingDirectory string, supportedPythonVersions []strin
 
 	constraint, err := semver.NewConstraint(version)
 	if err != nil {
-		return "", fmt.Errorf("error parsing version python constraint: %s", err.Error())
+		return "", fmt.Errorf("error parsing version python constraint: %w", err)
 	}
 
 	for _, version := range supportedPythonVersions {
@@ -249,13 +246,13 @@ func parsePythonVersion(workingDirectory string, supportedPythonVersions []strin
 func parsePythonVersionFromPipfileLock(workingDirectory string) (string, error) {
 	f, err := os.Open(filepath.Join(workingDirectory, "Pipfile.lock"))
 	if err != nil {
-		return "", fmt.Errorf("error opening Pipefile.lock: %s", err.Error())
+		return "", fmt.Errorf("error opening Pipefile.lock: %w", err)
 	}
 	defer f.Close()
 
 	bytes, err := ioutil.ReadAll(f)
 	if err != nil {
-		return "", fmt.Errorf("error reading Pipefile.lock: %s", err.Error())
+		return "", fmt.Errorf("error reading Pipefile.lock: %w", err)
 	}
 
 	type PipefileLock struct {
@@ -267,7 +264,7 @@ func parsePythonVersionFromPipfileLock(workingDirectory string) (string, error) 
 	}
 	var pipefileLock PipefileLock
 	if err := json.Unmarshal(bytes, &pipefileLock); err != nil {
-		return "", fmt.Errorf("error unmarshaling Pipfile.lock: %s", err.Error())
+		return "", fmt.Errorf("error unmarshaling Pipfile.lock: %w", err)
 	}
 
 	if pipefileLock.Meta.Requires.PythonVersion == "" {
@@ -280,13 +277,13 @@ func parsePythonVersionFromPipfileLock(workingDirectory string) (string, error) 
 func parsePythonVersionFromPoetryLock(workingDirectory string, supportedPythonVersions []string) (string, error) {
 	f, err := os.Open(filepath.Join(workingDirectory, "poetry.lock"))
 	if err != nil {
-		return "", fmt.Errorf("error opening poetry.lock: %s", err.Error())
+		return "", fmt.Errorf("error opening poetry.lock: %w", err)
 	}
 	defer f.Close()
 
 	bytes, err := ioutil.ReadAll(f)
 	if err != nil {
-		return "", fmt.Errorf("error reading poetry.lock: %s", err.Error())
+		return "", fmt.Errorf("error reading poetry.lock: %w", err)
 	}
 
 	type PoetryLock struct {
@@ -296,7 +293,7 @@ func parsePythonVersionFromPoetryLock(workingDirectory string, supportedPythonVe
 	}
 	var poetryLock PoetryLock
 	if err := toml.Unmarshal(bytes, &poetryLock); err != nil {
-		return "", fmt.Errorf("error unmarshaling poetry.lock: %s", err.Error())
+		return "", fmt.Errorf("error unmarshaling poetry.lock: %w", err)
 	}
 
 	if poetryLock.Metadata.PythonVersions == "" || poetryLock.Metadata.PythonVersions == "*" {
@@ -309,7 +306,7 @@ func parsePythonVersionFromPoetryLock(workingDirectory string, supportedPythonVe
 
 	constraint, err := semver.NewConstraint(poetryLock.Metadata.PythonVersions)
 	if err != nil {
-		return "", fmt.Errorf("error parsing poetry.lock python constraint: %s", err.Error())
+		return "", fmt.Errorf("error parsing poetry.lock python constraint: %w", err)
 	}
 
 	for _, version := range supportedPythonVersions {
@@ -329,13 +326,13 @@ func parsePythonVersionFromPoetryLock(workingDirectory string, supportedPythonVe
 func parsePythonVersionFromRuntimeTxt(workingDirectory string) (string, error) {
 	f, err := os.Open(filepath.Join(workingDirectory, "runtime.txt"))
 	if err != nil {
-		return "", fmt.Errorf("error opening runtime.txt: %s", err.Error())
+		return "", fmt.Errorf("error opening runtime.txt: %w", err)
 	}
 	defer f.Close()
 
 	bytes, err := ioutil.ReadAll(f)
 	if err != nil {
-		return "", fmt.Errorf("error reading runtime.txt: %s", err.Error())
+		return "", fmt.Errorf("error reading runtime.txt: %w", err)
 	}
 
 	lines := strings.Split(strings.TrimSpace(string(bytes)), "\n")
@@ -350,7 +347,7 @@ func parsePythonVersionFromRuntimeTxt(workingDirectory string) (string, error) {
 
 	v, err := semver.NewVersion(parts[1])
 	if err != nil {
-		return "", fmt.Errorf("error parsing semver from runtime.txt: %s", err.Error())
+		return "", fmt.Errorf("error parsing semver from runtime.txt: %w", err)
 	}
 
 	return fmt.Sprintf("%d.%d", v.Major(), v.Minor()), nil

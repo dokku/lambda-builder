@@ -33,7 +33,7 @@ func (b DotnetBuilder) Detect() bool {
 
 func (b DotnetBuilder) Execute() error {
 	b.Config.HandlerMap = b.GetHandlerMap()
-	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+	return executeBuilder(b.script(), b.Config)
 }
 
 func (b DotnetBuilder) GetBuildImage() string {
@@ -48,10 +48,6 @@ func (b DotnetBuilder) GetHandlerMap() map[string]string {
 	return map[string]string{}
 }
 
-func (b DotnetBuilder) GetTaskBuildDir() string {
-	return "/var/task"
-}
-
 func (b DotnetBuilder) Name() string {
 	return "dotnet"
 }
@@ -60,6 +56,8 @@ func (b DotnetBuilder) script() string {
 	return `
 #!/usr/bin/env bash
 set -eo pipefail
+
+[ "$BUILDER_XTRACE" ] && set -o xtrace
 
 indent() {
   sed -u "s/^/       /"

@@ -46,13 +46,9 @@ func (b RubyBuilder) GetHandlerMap() map[string]string {
 	}
 }
 
-func (b RubyBuilder) GetTaskBuildDir() string {
-	return "/var/task"
-}
-
 func (b RubyBuilder) Execute() error {
 	b.Config.HandlerMap = b.GetHandlerMap()
-	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+	return executeBuilder(b.script(), b.Config)
 }
 
 func (b RubyBuilder) Name() string {
@@ -63,6 +59,8 @@ func (b RubyBuilder) script() string {
 	return `
 #!/usr/bin/env bash
 set -eo pipefail
+
+[ "$BUILDER_XTRACE" ] && set -o xtrace
 
 indent() {
   sed -u "s/^/       /"
