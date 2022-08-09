@@ -1,6 +1,8 @@
 package builders
 
 import (
+	"bytes"
+	"context"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -11,6 +13,7 @@ import (
 	"lambda-builder/io"
 
 	execute "github.com/alexellis/go-execute/pkg/v1"
+	extract "github.com/codeclysm/extract/v3"
 	"gopkg.in/yaml.v2"
 )
 
@@ -20,7 +23,6 @@ type Builder interface {
 	GetBuildImage() string
 	GetConfig() Config
 	GetHandlerMap() map[string]string
-	GetTaskBuildDir() string
 	Name() string
 }
 
@@ -57,22 +59,30 @@ type LambdaYML struct {
 	RunImage   string `yaml:"run_image"`
 }
 
-func executeBuilder(script string, taskBuildDir string, config Config) error {
-	tmp, err := os.MkdirTemp("", "lambda-builder")
-	defer func() {
-		os.RemoveAll(tmp)
-	}()
-
-	if err != nil {
-		return fmt.Errorf("error preparing temporary build directory: %s", err.Error())
-	}
-
-	if err := executeBuildContainer(tmp, script, taskBuildDir, config); err != nil {
+func executeBuilder(script string, config Config) error {
+	if err := executeBuildContainer(script, config); err != nil {
 		return err
 	}
 
-	handler := getFunctionHandler(tmp, config)
-	if config.WriteProcfile && !io.FileExistsInDirectory(tmp, "Procfile") {
+	taskHostBuildDir, err := os.MkdirTemp("", "lambda-builder")
+	if err != nil {
+		return fmt.Errorf("error creating build dir: %w", err)
+	}
+
+	defer func() {
+		os.RemoveAll(taskHostBuildDir)
+	}()
+
+	fmt.Printf("-----> Extracting lambda.zip into build context dir\n")
+	zipPath := filepath.Join(config.WorkingDirectory, "lambda.zip")
+	data, _ := ioutil.ReadFile(zipPath)
+	buffer := bytes.NewBuffer(data)
+	if err := extract.Zip(context.Background(), buffer, taskHostBuildDir, nil); err != nil {
+		return fmt.Errorf("error extracting lambda.zip into build context dir: %w", err)
+	}
+
+	handler := getFunctionHandler(taskHostBuildDir, config)
+	if config.WriteProcfile && !io.FileExistsInDirectory(taskHostBuildDir, "Procfile") {
 		if handler == "" {
 			fmt.Printf(" !     Unable to detect handler in build directory\n")
 		} else {
@@ -80,12 +90,12 @@ func executeBuilder(script string, taskBuildDir string, config Config) error {
 
 			fmt.Printf("       Writing to working directory\n")
 			if err := writeProcfile(handler, config.WorkingDirectory); err != nil {
-				return fmt.Errorf("error writing Procfile to working directory: %s", err.Error())
+				return fmt.Errorf("error writing Procfile to working directory: %w", err)
 			}
 
 			fmt.Printf("       Writing to build directory\n")
-			if err := writeProcfile(handler, tmp); err != nil {
-				return fmt.Errorf("error writing Procfile to temporary build directory: %s", err.Error())
+			if err := writeProcfile(handler, taskHostBuildDir); err != nil {
+				return fmt.Errorf("error writing Procfile to temporary build directory: %w", err)
 			}
 		}
 	}
@@ -93,12 +103,22 @@ func executeBuilder(script string, taskBuildDir string, config Config) error {
 	if config.GenerateImage {
 		fmt.Printf("=====> Building image\n")
 		fmt.Printf("       Generating temporary Dockerfile\n")
-		if err := generateDockerfile(handler, tmp, config); err != nil {
+
+		dockerfilePath, err := ioutil.TempFile("", "lambda-builder")
+		defer func() {
+			os.Remove(dockerfilePath.Name())
+		}()
+
+		if err != nil {
+			return fmt.Errorf("error generating temporary Dockerfile: %w", err)
+		}
+
+		if err := generateDockerfile(handler, config, dockerfilePath); err != nil {
 			return err
 		}
 
 		fmt.Printf("       Executing build of %s\n", config.GetImageTag())
-		if err := buildDockerImage(tmp, config); err != nil {
+		if err := buildDockerImage(taskHostBuildDir, config, dockerfilePath); err != nil {
 			return err
 		}
 	}
@@ -106,7 +126,7 @@ func executeBuilder(script string, taskBuildDir string, config Config) error {
 	return nil
 }
 
-func executeBuildContainer(tmp string, script string, taskBuildDir string, config Config) error {
+func executeBuildContainer(script string, config Config) error {
 	args := []string{
 		"container",
 		"run",
@@ -115,7 +135,6 @@ func executeBuildContainer(tmp string, script string, taskBuildDir string, confi
 		"--label", "com.dokku.lambda-builder/executor=true",
 		"--name", fmt.Sprintf("lambda-builder-executor-%s", config.Identifier),
 		"--volume", fmt.Sprintf("%s:/tmp/task", config.WorkingDirectory),
-		"--volume", fmt.Sprintf("%s:%s", tmp, taskBuildDir),
 	}
 
 	for _, envPair := range config.BuildEnv {
@@ -132,7 +151,7 @@ func executeBuildContainer(tmp string, script string, taskBuildDir string, confi
 
 	res, err := cmd.Execute()
 	if err != nil {
-		return fmt.Errorf("error executing builder: %s", err.Error())
+		return fmt.Errorf("error executing builder: %w", err)
 	}
 
 	if res.ExitCode != 0 {
@@ -142,13 +161,7 @@ func executeBuildContainer(tmp string, script string, taskBuildDir string, confi
 	return nil
 }
 
-func generateDockerfile(cmd string, directory string, config Config) error {
-	dockerfileName := filepath.Join(directory, fmt.Sprintf("%s.Dockerfile", config.Identifier))
-	f, err := os.Create(dockerfileName)
-	if err != nil {
-		return fmt.Errorf("error creating Dockerfile: %s", err)
-	}
-
+func generateDockerfile(cmd string, config Config, dockerfilePath *os.File) error {
 	tpl, err := template.New("t1").Parse(`
 FROM {{ .run_image }}
 {{ if ne .port "-1" }}
@@ -174,18 +187,18 @@ COPY . /var/task
 		"run_image": config.BuilderRunImage,
 	}
 
-	if err := tpl.Execute(f, data); err != nil {
+	if err := tpl.Execute(dockerfilePath, data); err != nil {
 		return fmt.Errorf("error writing Dockerfile: %s", err)
 	}
 
 	return nil
 }
 
-func buildDockerImage(directory string, config Config) error {
+func buildDockerImage(directory string, config Config, dockerfilePath *os.File) error {
 	args := []string{
 		"image",
 		"build",
-		"--file", filepath.Join(directory, fmt.Sprintf("%s.Dockerfile", config.Identifier)),
+		"--file", dockerfilePath.Name(),
 		"--progress", "plain",
 		"--tag", config.GetImageTag(),
 	}
@@ -205,7 +218,7 @@ func buildDockerImage(directory string, config Config) error {
 
 	res, err := cmd.Execute()
 	if err != nil {
-		return fmt.Errorf("error building image: %s", err.Error())
+		return fmt.Errorf("error building image: %w", err)
 	}
 
 	if res.ExitCode != 0 {
@@ -223,17 +236,17 @@ func ParseLambdaYML(config Config) (LambdaYML, error) {
 
 	f, err := os.Open(filepath.Join(config.WorkingDirectory, "lambda.yml"))
 	if err != nil {
-		return lambdaYML, fmt.Errorf("error opening lambda.yml: %s", err.Error())
+		return lambdaYML, fmt.Errorf("error opening lambda.yml: %w", err)
 	}
 	defer f.Close()
 
 	bytes, err := ioutil.ReadAll(f)
 	if err != nil {
-		return lambdaYML, fmt.Errorf("error reading lambda.yml: %s", err.Error())
+		return lambdaYML, fmt.Errorf("error reading lambda.yml: %w", err)
 	}
 
 	if err := yaml.Unmarshal(bytes, &lambdaYML); err != nil {
-		return lambdaYML, fmt.Errorf("error unmarshaling lambda.yml: %s", err.Error())
+		return lambdaYML, fmt.Errorf("error unmarshaling lambda.yml: %w", err)
 	}
 
 	return lambdaYML, nil

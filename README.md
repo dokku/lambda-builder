@@ -15,12 +15,12 @@ I don't want to go through the motions of figuring out the correct way to build 
 
 ```shell
 # substitute the version number as desired
-go build -ldflags "-X main.Version=0.3.0
+go build -ldflags "-X main.Version=0.4.0"
 ```
 
 ## Usage
 
-```
+```text
 Usage: lambda-builder [--version] [--help] <command> [<args>]
 
 Available commands are:
@@ -65,7 +65,7 @@ A docker image can be produced from the generated artifact by specifying the `--
 
 ```shell
 # will write a lambda.zip in the specified path
-# and generate a docker image named `lambda-builder:$APP:latest`
+# and generate a docker image named `lambda-builder/$APP:latest`
 # where $APP is the last portion of the working directory
 lambda-builder build --generate-image
 
@@ -101,7 +101,7 @@ A generated image can be run locally with the following line:
 ```shell
 # run the container and ensure it stays open
 # replace `$APP` with your folder name
-docker run --rm -it -e DOCKER_LAMBDA_STAY_OPEN=1 -p 9001:9001 "lambda-builder:$APP:latest"
+docker run --rm -it -e DOCKER_LAMBDA_STAY_OPEN=1 -p 9001:9001 "lambda-builder/$APP:latest"
 
 # invoke it using the awscli (v2)
 # note that the function name in this example is `function.handler`
@@ -109,6 +109,9 @@ aws lambda invoke --endpoint http://localhost:9001 --no-sign-request --function-
 
 # invoke it via curl
 curl -d '{}' http://localhost:9001/2015-03-31/functions/function.handler/invocations
+
+# the function can also be invoked directly from a container if desired
+docker run --rm "lambda-builder/$APP:latest" function.handler '{"name": "World"}' 
 ```
 
 #### Generating a Procfile

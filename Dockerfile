@@ -1,8 +1,10 @@
-FROM golang:1.18.1-buster
+FROM golang:1.19.0-buster
 
 # hadolint ignore=DL3027
 RUN apt-get update \
-    && apt install apt-transport-https bats build-essential curl gnupg2 jq lintian rpm rsync rubygems-integration ruby-dev ruby -qy \
+    && apt install apt-transport-https build-essential curl gnupg2 jq lintian rpm rsync rubygems-integration ruby-dev ruby -qy \
+    && git clone https://github.com/bats-core/bats-core.git /tmp/bats-core \
+    && /tmp/bats-core/install.sh /usr/local \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

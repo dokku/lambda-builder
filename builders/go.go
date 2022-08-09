@@ -37,7 +37,7 @@ func (b GoBuilder) Detect() bool {
 
 func (b GoBuilder) Execute() error {
 	b.Config.HandlerMap = b.GetHandlerMap()
-	return executeBuilder(b.script(), b.GetTaskBuildDir(), b.Config)
+	return executeBuilder(b.script(), b.Config)
 }
 
 func (b GoBuilder) GetBuildImage() string {
@@ -54,10 +54,6 @@ func (b GoBuilder) GetHandlerMap() map[string]string {
 	}
 }
 
-func (b GoBuilder) GetTaskBuildDir() string {
-	return "/go/src/handler"
-}
-
 func (b GoBuilder) Name() string {
 	return "go"
 }
@@ -66,6 +62,8 @@ func (b GoBuilder) script() string {
 	return `
 #!/usr/bin/env bash
 set -eo pipefail
+
+[ "$BUILDER_XTRACE" ] && set -o xtrace
 
 indent() {
   sed -u "s/^/       /"
