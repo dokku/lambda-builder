@@ -7,8 +7,9 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/alexellis/go-execute v0.5.0
 	github.com/aws/aws-lambda-go v1.34.1
+	github.com/codeclysm/extract/v3 v3.0.2
 	github.com/google/uuid v1.3.0
-	github.com/josegonzalez/cli-skeleton v0.5.0
+	github.com/josegonzalez/cli-skeleton v0.6.0
 	github.com/mattn/go-isatty v0.0.14
 	github.com/mitchellh/cli v1.1.4
 	github.com/posener/complete v1.2.3
@@ -23,7 +24,6 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
-	github.com/codeclysm/extract/v3 v3.0.2 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/h2non/filetype v1.0.6 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
