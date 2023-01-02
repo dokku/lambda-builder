@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-lambda-go v1.36.1
 	github.com/codeclysm/extract/v3 v3.0.2
 	github.com/google/uuid v1.3.0
-	github.com/josegonzalez/cli-skeleton v0.5.0
+	github.com/josegonzalez/cli-skeleton v0.7.0
 	github.com/mattn/go-isatty v0.0.17
 	github.com/mitchellh/cli v1.1.5
 	github.com/posener/complete v1.2.3
@@ -31,13 +31,13 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
-	github.com/mattn/go-colorable v0.1.12 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
-	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
-	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
-	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 // indirect
+	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a // indirect
+	golang.org/x/sys v0.0.0-20221013171732-95e765b1cc43 // indirect
+	golang.org/x/term v0.0.0-20220919170432-7a66f970e087 // indirect
 )
