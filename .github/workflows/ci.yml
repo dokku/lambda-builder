@@ -14,19 +14,13 @@ on:
 jobs:
   build:
     name: build
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: true
+    runs-on: ubuntu-22.04
     env:
       GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
       PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
 
     steps:
       - uses: actions/checkout@v3
-      - name: debug home
-        run: |
-          echo "$PWD"
-          echo "$HOME"
       - name: make version
         run: |
           make version .env.docker
