@@ -257,4 +257,5 @@ validate:
 	cd /home/runner/work/$(REPOSITORY)/$(REPOSITORY) && bats test.bats
 
 prebuild:
-	true
+	git config --global --add safe.directory $(shell pwd)
+	git status
