@@ -10,7 +10,7 @@ require (
 	github.com/codeclysm/extract/v3 v3.1.0
 	github.com/google/uuid v1.3.0
 	github.com/josegonzalez/cli-skeleton v0.7.0
-	github.com/mattn/go-isatty v0.0.18
+	github.com/mattn/go-isatty v0.0.19
 	github.com/mitchellh/cli v1.1.5
 	github.com/posener/complete v1.2.3
 	github.com/rs/zerolog v1.29.1
