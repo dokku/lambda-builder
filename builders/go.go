@@ -113,9 +113,11 @@ hook-package() {
 
   puts-step "Creating package at lambda.zip"
   zip -q -r lambda.zip bootstrap
+  mv lambda.zip /var/task/lambda.zip
 }
 
 cp -a /var/task/. /go/src/handler
+cd /go/src/handler
 hook-pre-compile
 install-gomod
 hook-post-compile
