@@ -63,10 +63,6 @@ indent() {
   sed -u "s/^/       /"
 }
 
-puts-header() {
-  echo "=====> $*"
-}
-
 puts-step() {
   echo "-----> $*"
 }
