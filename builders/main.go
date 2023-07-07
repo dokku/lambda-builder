@@ -113,7 +113,7 @@ func executeBuilder(script string, config Config) error {
 			return fmt.Errorf("error generating temporary Dockerfile: %w", err)
 		}
 
-		if err := generateDockerfile(handler, config, dockerfilePath); err != nil {
+		if err := generateRunDockerfile(handler, config, dockerfilePath); err != nil {
 			return err
 		}
 
@@ -161,7 +161,7 @@ func executeBuildContainer(script string, config Config) error {
 	return nil
 }
 
-func generateDockerfile(cmd string, config Config, dockerfilePath *os.File) error {
+func generateRunDockerfile(cmd string, config Config, dockerfilePath *os.File) error {
 	tpl, err := template.New("t1").Parse(`
 FROM {{ .run_image }}
 {{ if ne .port "-1" }}
