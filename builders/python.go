@@ -97,10 +97,6 @@ indent() {
   sed -u "s/^/       /"
 }
 
-puts-header() {
-  echo "=====> $*"
-}
-
 puts-step() {
   echo "-----> $*"
 }
@@ -181,11 +177,8 @@ hook-package() {
 
   puts-step "Creating package at lambda.zip"
   zip -q -r lambda.zip ./*
-  mv lambda.zip /tmp/task/lambda.zip
-  rm -rf lambda.zip
 }
 
-cp -a /tmp/task/. /var/task
 hook-pre-compile
 
 if [[ -f "requirements.txt" ]]; then
