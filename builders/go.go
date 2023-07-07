@@ -115,7 +115,7 @@ hook-package() {
   zip -q -r lambda.zip bootstrap
 }
 
-cp -a /tmp/task/. /go/src/handler
+cp -a /var/task/. /go/src/handler
 hook-pre-compile
 install-gomod
 hook-post-compile
