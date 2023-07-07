@@ -22,7 +22,7 @@ type BuildCommand struct {
 	buildEnv         []string
 	builder          string
 	buildImage       string
-	generateImage    bool
+	generateRunImage bool
 	handler          string
 	imageEnv         []string
 	imageTag         string
@@ -73,7 +73,7 @@ func (c *BuildCommand) FlagSet() *flag.FlagSet {
 	}
 
 	f := c.Meta.FlagSet(c.Name(), command.FlagSetClient)
-	f.BoolVar(&c.generateImage, "generate-image", false, "build a docker image")
+	f.BoolVar(&c.generateRunImage, "generate-image", false, "build a docker image")
 	f.BoolVar(&c.quiet, "quiet", false, "run builder in quiet mode")
 	f.BoolVar(&c.writeProcfile, "write-procfile", false, "writes a Procfile if a handler is specified or detected")
 	f.IntVar(&c.port, "port", -1, "set the default port for the lambda to listen on")
@@ -149,7 +149,7 @@ func (c *BuildCommand) Run(args []string) int {
 		Builder:           c.builder,
 		BuilderBuildImage: c.buildImage,
 		BuilderRunImage:   c.runImage,
-		GenerateImage:     c.generateImage,
+		GenerateRunImage:  c.generateRunImage,
 		Identifier:        identifier,
 		ImageEnv:          c.imageEnv,
 		ImageLabels:       c.labels,

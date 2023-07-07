@@ -31,7 +31,7 @@ type Config struct {
 	Builder           string
 	BuilderBuildImage string
 	BuilderRunImage   string
-	GenerateImage     bool
+	GenerateRunImage  bool
 	Handler           string
 	HandlerMap        map[string]string
 	Identifier        string
@@ -100,7 +100,7 @@ func executeBuilder(script string, config Config) error {
 		}
 	}
 
-	if config.GenerateImage {
+	if config.GenerateRunImage {
 		fmt.Printf("=====> Building image\n")
 		fmt.Printf("       Generating temporary Dockerfile\n")
 
