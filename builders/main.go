@@ -7,13 +7,14 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	"lambda-builder/io"
 
-	execute "github.com/alexellis/go-execute/pkg/v1"
+	execute "github.com/alexellis/go-execute/pkg/v2"
 	extract "github.com/codeclysm/extract/v3"
 	"gopkg.in/yaml.v2"
 )
@@ -170,6 +171,15 @@ func executeBuildContainer(script string, config Config) error {
 			"--force",
 			buildImageTag,
 		}
+
+		signals := make(chan os.Signal, 1)
+		signal.Notify(signals, os.Interrupt)
+		ctx, cancel := context.WithCancel(context.Background())
+		go func() {
+			<-signals
+			cancel()
+		}()
+
 		cmd := execute.ExecTask{
 			Args:        args,
 			Command:     "docker",
@@ -177,7 +187,7 @@ func executeBuildContainer(script string, config Config) error {
 			StreamStdio: !config.RunQuiet,
 		}
 
-		if _, err := cmd.Execute(); err != nil {
+		if _, err := cmd.Execute(ctx); err != nil {
 			fmt.Printf("       Error cleaning up build image: %s", err.Error())
 		}
 	}()
@@ -232,6 +242,14 @@ func extractLambdaFromBuildImage(config Config) error {
 
 	args = append(args, fmt.Sprintf("%s-build", config.GetImageTag()), "/bin/bash", "-c", "mv /var/task/lambda.zip /tmp/task/lambda.zip")
 
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		<-signals
+		cancel()
+	}()
+
 	cmd := execute.ExecTask{
 		Args:        args,
 		Command:     "docker",
@@ -239,7 +257,7 @@ func extractLambdaFromBuildImage(config Config) error {
 		StreamStdio: !config.RunQuiet,
 	}
 
-	res, err := cmd.Execute()
+	res, err := cmd.Execute(ctx)
 	if err != nil {
 		return fmt.Errorf("error executing builder: %w", err)
 	}
@@ -306,6 +324,14 @@ func buildDockerImage(directory string, config Config, phase string, dockerfileP
 
 	args = append(args, directory)
 
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		<-signals
+		cancel()
+	}()
+
 	cmd := execute.ExecTask{
 		Args:        args,
 		Command:     "docker",
@@ -313,7 +339,7 @@ func buildDockerImage(directory string, config Config, phase string, dockerfileP
 		StreamStdio: !config.RunQuiet,
 	}
 
-	res, err := cmd.Execute()
+	res, err := cmd.Execute(ctx)
 	if err != nil {
 		return fmt.Errorf("error building image: %w", err)
 	}
