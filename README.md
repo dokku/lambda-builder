@@ -15,7 +15,7 @@ I don't want to go through the motions of figuring out the correct way to build 
 
 ```shell
 # substitute the version number as desired
-go build -ldflags "-X main.Version=0.4.0"
+go build -ldflags "-X main.Version=0.5.0"
 ```
 
 ## Usage
@@ -57,7 +57,7 @@ A `builder` can be chosen by a flag. Note that while a `builder` may be selected
 
 ```shell
 lambda-builder build --generate-image --builder dotnet
-````
+```
 
 #### Building an image
 
@@ -81,7 +81,7 @@ By default, any web process started by the built image starts on port `9001`. Th
 ```shell
 # build the image and ensure it starts on port 5000 by default
 lambda-builder build --generate-image --port 5000
-````
+```
 
 Custom environment variables can be supplied for the built image by specifying one or more `--image-env` flags. The `--image-env` flag takes `KEY=VALUE` pairs.
 
@@ -94,7 +94,7 @@ The `build-image` and `run-image` can also be specified as flags:
 
 ```shell
 lambda-builder build --generate-image --build-image "mlupin/docker-lambda:dotnetcore3.1-build" --run-image "mlupin/docker-lambda:dotnetcore3.1"
-````
+```
 
 A generated image can be run locally with the following line:
 
