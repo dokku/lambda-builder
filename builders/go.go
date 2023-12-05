@@ -8,7 +8,7 @@ type GoBuilder struct {
 
 func NewGoBuilder(config Config) (GoBuilder, error) {
 	var err error
-	config.BuilderBuildImage, err = getBuildImage(config, "lambci/lambda:build-go1.x")
+	config.BuilderBuildImage, err = getBuildImage(config, "golang:1.21-bookworm")
 	if err != nil {
 		return GoBuilder{}, err
 	}
@@ -83,7 +83,7 @@ install-gomod() {
   fi
 
   puts-step "Compiling via go build"
-  go build -o bootstrap main.go 2>&1 | indent
+  CGO_ENABLED=0 go build -o bootstrap main.go 2>&1 | indent
 }
 
 hook-pre-compile() {
@@ -109,6 +109,11 @@ hook-post-compile() {
 hook-package() {
   if [[ "$LAMBDA_BUILD_ZIP" != "1" ]]; then
     return
+  fi
+
+  if ! command -v zip >/dev/null 2>&1; then
+    puts-step "Installing zip dependency for packaging"
+    apt update && apt install -y --no-install-recommends zip
   fi
 
   puts-step "Creating package at lambda.zip"
