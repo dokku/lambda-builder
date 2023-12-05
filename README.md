@@ -141,7 +141,7 @@ Internally, `lambda-builder` detects a given language and builds the app accordi
     - dotnet6
     - dotnetcore3.1
 - `go`
-  - default build image: `lambci/lambda:build-go1.x`
+  - default build image: `golang:1.21-bookworm`
   - requirement: `go.mod` or `main.go`
   - runtimes:
     - provided.al2
