@@ -8,7 +8,12 @@ type GoBuilder struct {
 
 func NewGoBuilder(config Config) (GoBuilder, error) {
 	var err error
-	config.BuilderBuildImage, err = getBuildImage(config, "golang:1.21-bookworm")
+	defaultBuilder := "golang:1.21-bookworm"
+	if !io.FileExistsInDirectory(config.WorkingDirectory, "go.mod") {
+		defaultBuilder = "golang:1.17-bullseye"
+	}
+
+	config.BuilderBuildImage, err = getBuildImage(config, defaultBuilder)
 	if err != nil {
 		return GoBuilder{}, err
 	}
