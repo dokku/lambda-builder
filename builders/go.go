@@ -84,6 +84,7 @@ install-gomod() {
     go mod download 2>&1 | indent
   else
     puts-step "Missing go.mod, downloading dependencies via go get"
+	go env -w GO111MODULE=off
     go get
   fi
 
