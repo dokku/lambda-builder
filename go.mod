@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-lambda-go v1.43.0
 	github.com/codeclysm/extract/v3 v3.1.1
 	github.com/google/uuid v1.5.0
-	github.com/josegonzalez/cli-skeleton v0.11.0
+	github.com/josegonzalez/cli-skeleton v0.13.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/mitchellh/cli v1.1.5
 	github.com/posener/complete v1.2.3
@@ -25,7 +25,6 @@ require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
