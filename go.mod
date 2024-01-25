@@ -8,7 +8,7 @@ require (
 	github.com/alexellis/go-execute v0.6.0
 	github.com/aws/aws-lambda-go v1.45.0
 	github.com/codeclysm/extract/v3 v3.1.1
-	github.com/google/uuid v1.5.0
+	github.com/google/uuid v1.6.0
 	github.com/josegonzalez/cli-skeleton v0.11.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/mitchellh/cli v1.1.5
