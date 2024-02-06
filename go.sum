@@ -49,8 +49,8 @@ github.com/huandu/xstrings v1.3.2/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq
 github.com/imdario/mergo v0.3.11/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
 github.com/imdario/mergo v0.3.13 h1:lFzP57bqS/wsqKssCGmtLAb8A0wKjLGrve2q3PPVcBk=
 github.com/imdario/mergo v0.3.13/go.mod h1:4lJ1jqUDcsbIECGy0RUJAXNIhg+6ocWgb1ALK2O4oXg=
-github.com/josegonzalez/cli-skeleton v0.14.0 h1:ipKK6VanurRoLJjf92IbPMwZL2m4/iR128hWEU8Yv+k=
-github.com/josegonzalez/cli-skeleton v0.14.0/go.mod h1:NpbSOJlZwzJpTqidskODF76JZogzkuWowf1wyZi0XzI=
+github.com/josegonzalez/cli-skeleton v0.15.0 h1:8AuxPC+KioDnBf9K+ZIE+1tYbayOUBJAluoUnCyHdIc=
+github.com/josegonzalez/cli-skeleton v0.15.0/go.mod h1:iCpaNFH5JS8kk8VfEsa+Ml6VNw/3oIIPYV7XDXaBypA=
 github.com/juju/ansiterm v0.0.0-20180109212912-720a0952cc2a/go.mod h1:UJSiEoRfvx3hP73CvoARgeLjaIOjybY9vj8PUPPFGeU=
 github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 h1:rhqTjzJlm7EbkELJDKMTU7udov+Se0xZkWmugr6zGok=
 github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5/go.mod h1:W54LbzXuIE0boCoNJfwqpmkKJ1O4TCTZMetAt6jGk7Q=
