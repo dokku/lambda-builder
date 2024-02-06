@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-lambda-go v1.46.0
 	github.com/codeclysm/extract/v3 v3.1.1
 	github.com/google/uuid v1.6.0
-	github.com/josegonzalez/cli-skeleton v0.14.0
+	github.com/josegonzalez/cli-skeleton v0.15.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/mitchellh/cli v1.1.5
 	github.com/posener/complete v1.2.3
