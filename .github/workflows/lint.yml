@@ -13,20 +13,20 @@ on:
 jobs:
   hadolint:
     name: hadolint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run hadolint
         uses: hadolint/hadolint-action@54c9adbab1582c2ef04b2016b760714a4bfde3cf
         # v1.5.0 => c27bd9edc1e95eed30474db8f295ff5807ebca14
 
   markdown-lint:
     name: markdown-lint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@04d43ee9191307b50935a753da3b775ab695eceb
         # v1.5.0 => 04d43ee9191307b50935a753da3b775ab695eceb
@@ -36,10 +36,10 @@ jobs:
 
   shellcheck:
     name: shellcheck
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run shellcheck
         uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38
         # 1.1.0 => 94e0aab03ca135d11a35e5bfc14e6746dc56e7e9
@@ -47,12 +47,12 @@ jobs:
           SHELLCHECK_OPTS: -s bash
   shfmt:
     name: shfmt
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run shfmt
-        uses: luizm/action-sh-checker@76ab0b22e1f194e4a582edc7969df6485c4e9246
+        uses: luizm/action-sh-checker@c6edb3de93e904488b413636d96c6a56e3ad671a
         # v0.3.0 => 7f44869033b40ee4ffe7dc76c87a1bc66e3d025a
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -63,10 +63,10 @@ jobs:
 
   yamllint:
     name: yamllint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run yamllint
         uses: ibiqlik/action-yamllint@2576378a8e339169678f9939646ee3ee325e845c
         # v3.0.2 => c19bd0523a9011c3a3960fe6640a0882b59af15d

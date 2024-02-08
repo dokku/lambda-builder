@@ -6,14 +6,14 @@ require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/Masterminds/semver v1.5.0
 	github.com/alexellis/go-execute v0.6.0
-	github.com/aws/aws-lambda-go v1.41.0
+	github.com/aws/aws-lambda-go v1.46.0
 	github.com/codeclysm/extract/v3 v3.1.1
-	github.com/google/uuid v1.3.0
-	github.com/josegonzalez/cli-skeleton v0.9.0
-	github.com/mattn/go-isatty v0.0.19
+	github.com/google/uuid v1.6.0
+	github.com/josegonzalez/cli-skeleton v0.15.0
+	github.com/mattn/go-isatty v0.0.20
 	github.com/mitchellh/cli v1.1.5
 	github.com/posener/complete v1.2.3
-	github.com/rs/zerolog v1.30.0
+	github.com/rs/zerolog v1.32.0
 	github.com/spf13/pflag v1.0.5
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -25,7 +25,6 @@ require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -41,8 +40,8 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
-	golang.org/x/crypto v0.11.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/term v0.10.0 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/term v0.16.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 )

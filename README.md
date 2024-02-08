@@ -61,7 +61,7 @@ lambda-builder build --generate-image --builder dotnet
 
 #### Building an image
 
-A docker image can be produced from the generated artifact by specifying the `--generate-image` flag. This also allows for multiple `--label`  flags as well as specifying a single image tag via either `-t` or `--tag`:
+A docker image can be produced from the generated artifact by specifying the `--generate-image` flag. This also allows for multiple `--label` flags as well as specifying a single image tag via either `-t` or `--tag`:
 
 ```shell
 # will write a lambda.zip in the specified path
@@ -111,7 +111,7 @@ aws lambda invoke --endpoint http://localhost:9001 --no-sign-request --function-
 curl -d '{}' http://localhost:9001/2015-03-31/functions/function.handler/invocations
 
 # the function can also be invoked directly from a container if desired
-docker run --rm "lambda-builder/$APP:latest" function.handler '{"name": "World"}' 
+docker run --rm "lambda-builder/$APP:latest" function.handler '{"name": "World"}'
 ```
 
 #### Generating a Procfile
@@ -141,7 +141,9 @@ Internally, `lambda-builder` detects a given language and builds the app accordi
     - dotnet6
     - dotnetcore3.1
 - `go`
-  - default build image: `lambci/lambda:build-go1.x`
+  - default build image:
+    - With `go.mod`: `golang:1.21-bookworm`
+    - Without `go.mod`: `golang:1.17-buster`
   - requirement: `go.mod` or `main.go`
   - runtimes:
     - provided.al2
