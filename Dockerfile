@@ -1,4 +1,4 @@
-FROM golang:1.22.2-bookworm
+FROM golang:1.22.3-bookworm
 
 # hadolint ignore=DL3027
 RUN apt-get update \
