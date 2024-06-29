@@ -8,7 +8,7 @@ type GoBuilder struct {
 
 func NewGoBuilder(config Config) (GoBuilder, error) {
 	var err error
-	defaultBuilder := "golang:1.21-bookworm"
+	defaultBuilder := "golang:1.22-bookworm"
 	if !io.FileExistsInDirectory(config.WorkingDirectory, "go.mod") {
 		defaultBuilder = "golang:1.17-bullseye"
 	}
