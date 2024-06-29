@@ -1,5 +1,5 @@
 module app
 
-go 1.18
+go 1.22
 
-require github.com/aws/aws-lambda-go v1.29.0 // indirect
+require github.com/aws/aws-lambda-go v1.29.0
