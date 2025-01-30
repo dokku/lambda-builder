@@ -16,7 +16,7 @@ require (
 	github.com/mitchellh/cli v1.1.5
 	github.com/posener/complete v1.2.3
 	github.com/rs/zerolog v1.33.0
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.6
 	gopkg.in/yaml.v2 v2.4.0
 )
 
