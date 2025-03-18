@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.2
 
 require (
-	github.com/BurntSushi/toml v1.4.0
+	github.com/BurntSushi/toml v1.5.0
 	github.com/Masterminds/semver v1.5.0
 	github.com/alexellis/go-execute v0.6.0
 	github.com/aws/aws-lambda-go v1.47.0
