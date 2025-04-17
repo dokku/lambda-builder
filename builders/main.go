@@ -15,7 +15,7 @@ import (
 	"lambda-builder/io"
 
 	execute "github.com/alexellis/go-execute/pkg/v2"
-	extract "github.com/codeclysm/extract/v3"
+	extract "github.com/codeclysm/extract/v4"
 	"gopkg.in/yaml.v2"
 )
 
