@@ -8,7 +8,7 @@ require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/Masterminds/semver v1.5.0
 	github.com/alexellis/go-execute v0.6.0
-	github.com/aws/aws-lambda-go v1.48.0
+	github.com/aws/aws-lambda-go v1.49.0
 	github.com/codeclysm/extract/v4 v4.0.0
 	github.com/google/uuid v1.6.0
 	github.com/josegonzalez/cli-skeleton v0.22.0
