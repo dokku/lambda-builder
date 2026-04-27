@@ -1,6 +1,6 @@
 module lambda-builder
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/BurntSushi/toml v1.6.0
@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-lambda-go v1.54.0
 	github.com/codeclysm/extract/v4 v4.0.0
 	github.com/google/uuid v1.6.0
-	github.com/josegonzalez/cli-skeleton v0.24.0
+	github.com/josegonzalez/cli-skeleton v0.25.0
 	github.com/mattn/go-isatty v0.0.22
 	github.com/mitchellh/cli v1.1.5
 	github.com/posener/complete v1.2.3
@@ -40,8 +40,8 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/ulikunitz/xz v0.5.14 // indirect
-	golang.org/x/crypto v0.45.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/term v0.37.0 // indirect
+	golang.org/x/crypto v0.50.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/term v0.42.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 )
